@@ -1,0 +1,98 @@
+$primary-color: #073861;
+
+.selectize-control{
+    position: relative;
+    width: 100%;
+
+    &.plugin-remove_button{
+        position: relative;
+    }
+    &.plugin-remove_button [data-value] .remove{
+        z-index: 1;
+        width: 16px;
+        margin-left: 3px;
+        text-align: center;
+        color: red;
+    }
+    .selectize-input, &.single, .selectize-input.input-active{
+        background-color: #fff;
+        cursor: text;
+        display: inline-block;
+        box-sizing: border-box;
+    }
+    .selectize-input{
+        width: 100%;
+        z-index: 1;
+        box-sizing: border-box;
+        padding: 4px 6px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+
+        > * {
+            vertical-align: baseline;
+            display: inline-block;
+            box-sizing: border-box;
+        }
+        > input{
+            padding: 0;
+            outline: none;
+            border: none;
+        }
+    }
+    &.multi .selectize-input > div{
+        background-color: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1px 4px 2px 4px;
+        margin: 0 6px 0 0;
+    }
+    .selectize-input.has-items > input{
+        padding: 0;
+        margin: 0;
+
+        &:focus{
+        }
+    }
+    &.multi .selectize-input.has-items{
+        padding: 2px 6px;
+    }
+    .selectize-dropdown{
+        position: absolute;
+        z-index: 11;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 3px 15px -5px rgba(0, 0, 0, 0.5);
+        background-color: #fff;
+        box-sizing: border-box;
+
+        [data-selectable]{
+            cursor: pointer;
+            overflow: hidden;
+            padding: 6px 10px;
+
+            &:hover{
+                background-color: $primary-color;
+                color: #fff;
+            }
+        }
+        .selectize-dropdown-content{
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: 320px;
+        }
+    }
+    &.single{
+        .selectize-input{
+            &:after{
+                content: ' ';
+                display: block;
+                position: absolute;
+                top: 50%;
+                right: 15px;
+                margin-top: -3px;
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 5px 4px 0 4px;
+                border-color: rgba(0, 0, 0, 0.5) transparent transparent transparent;
+            }
+        }
+    }
+}

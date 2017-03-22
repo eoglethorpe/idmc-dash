@@ -1,0 +1,160 @@
+body {
+  margin: 0;
+  width: 100vw;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  background-color: #f0f0f0;
+  font-size: 14px;
+  font-weight: 400; }
+  body * {
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif; }
+  body h1, body h2, body h3, body h4 {
+    margin: 0;
+    text-transform: uppercase;
+    color: #073861; }
+  body header {
+    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 80px;
+    margin: 0;
+    z-index: 1;
+    background-color: #fff;
+    box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.3); }
+    body header h1 {
+      margin: 0 16px; }
+  body main {
+    height: calc(100vh - 80px);
+    flex-basis: 80%;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center; }
+    body main .card {
+      background-color: #fff;
+      box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.3);
+      padding: 24px; }
+    body main #filter-wrapper {
+      height: calc(60% - 12px);
+      flex-basis: calc(40% - 12px); }
+      body main #filter-wrapper #filter-wrapper-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px; }
+        body main #filter-wrapper #filter-wrapper-header h2 {
+          flex-basis: 40%; }
+        body main #filter-wrapper #filter-wrapper-header #apply-filter-btn {
+          cursor: pointer;
+          background-color: #073861;
+          text-transform: uppercase;
+          border: none;
+          outline: none;
+          color: #fff;
+          font-weight: bold;
+          padding: 6px 24px; }
+      body main #filter-wrapper #filters .radio-btns {
+        width: calc(100% - 32px);
+        margin-bottom: 32px;
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap; }
+        body main #filter-wrapper #filters .radio-btns label {
+          flex-basis: 100%;
+          font-size: 0.8em;
+          text-transform: uppercase;
+          font-weight: 600;
+          color: rgba(0, 0, 0, 0.5);
+          margin-bottom: 6px; }
+        body main #filter-wrapper #filters .radio-btns input {
+          width: 24px;
+          vertical-align: sub; }
+        body main #filter-wrapper #filters .radio-btns .radio-label {
+          margin-bottom: 8px;
+          color: rgba(0, 0, 0, 0.8);
+          font-size: 1em;
+          text-transform: none;
+          margin-bottom: 0;
+          font-weight: 400;
+          cursor: pointer; }
+      body main #filter-wrapper #filters .select-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+        z-index: 2; }
+        body main #filter-wrapper #filters .select-wrapper label {
+          flex-basis: 100%;
+          font-size: 0.8em;
+          font-weight: 600;
+          text-transform: uppercase;
+          color: rgba(0, 0, 0, 0.5);
+          margin-bottom: 6px; }
+        body main #filter-wrapper #filters .select-wrapper > div {
+          flex-basis: 100%; }
+    body main #viewport-graph {
+      height: calc(60% - 12px);
+      flex-basis: calc(60% - 12px);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start; }
+      body main #viewport-graph img {
+        height: 95%;
+        width: 95%;
+        object-fit: contain; }
+    body main #the-map {
+      flex-basis: calc(40% - 12px);
+      height: calc(40% - 12px);
+      z-index: 1; }
+    body main #viewport-chart {
+      height: calc(40% - 12px);
+      flex-basis: calc(60% - 12px);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start; }
+      body main #viewport-chart img {
+        height: 90%;
+        width: 95%;
+        object-fit: contain; }
+  @media screen and (max-width: 1366px) {
+    body header {
+      height: 64px; }
+    body main {
+      flex-basis: 90%;
+      height: calc(100vh - 64px); } }
+  @media screen and (max-width: 1080px) {
+    body header {
+      height: 56px; }
+    body main {
+      flex-basis: 96%;
+      height: calc(100vh - 56px); } }
+  @media screen and (max-width: 720px) {
+    body header {
+      padding: 4px 0 12px 0;
+      height: auto; }
+    body main {
+      flex-basis: 100%;
+      height: auto; }
+      body main .card {
+        margin: 6px 0; }
+      body main #filter-wrapper {
+        flex-basis: 100%;
+        height: auto;
+        order: 1; }
+      body main #viewport-graph {
+        flex-basis: 100%;
+        height: auto;
+        order: 3; }
+      body main #the-map {
+        flex-basis: 100%;
+        height: 300px;
+        order: 2; }
+      body main #viewport-chart {
+        flex-basis: 100%;
+        height: auto;
+        order: 4; } }
+
+/*# sourceMappingURL=main.css.map */
