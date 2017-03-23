@@ -6,7 +6,7 @@ let countriesGeoData;
 let countriesMapLayer;
 
 function styleMapFeature(feature) {
-    let selected = $('#countries-select').val().indexOf(feature.properties.iso_a3) >= 0;
+    let selected = $('.countries-select').val().indexOf(feature.properties.iso_a3) >= 0;
     return {
         fillColor: selected ? '#073861' : '#ecf0f1',
         weight: 1.4,
@@ -18,7 +18,7 @@ function styleMapFeature(feature) {
 }
 
 function onEachMapFeature(feature, layer) {
-    $('#countries-select')[0].selectize.addOption({
+    $('.countries-select')[0].selectize.addOption({
         value: feature.properties.iso_a3,
         text: feature.properties.name,
     });
@@ -37,10 +37,12 @@ function refreshMap() {
 
 $(document).ready(function(){
 
-    $('#hazard-type').selectize();
-    $('#countries-select').selectize();
+    $('.hazard-type').selectize();
+    $('.countries-select').selectize();
+    $('.geo-region-select').selectize();
+    $('.income-group-select').selectize();
 
-    $('#countries-select').on('change', function() {
+    $('.countries-select').on('change', function() {
         refreshMap();
     });
 

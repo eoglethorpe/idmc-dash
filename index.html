@@ -26,38 +26,79 @@
     </header>
     <main>
         <div id="filter-wrapper" class="card">
-            <div id="filter-wrapper-header">
-                <h2>Filters</h2>
-                <button id='apply-filter-btn'>Apply</button>
-            </div>
             <div id="filters">
-                <div class="radio-btns">
-                    <label>Select Type</label>
-                    <label class="radio-label"><input type="radio" name="type">Retrospective</label>
-                    <label class="radio-label"><input type="radio" name="type">Prospective</label>
-                    <label class="radio-label"><input type="radio" name="type">Hybrid</label>
+                <div id="filter-wrapper-header">
+                    <h2>Filters</h2>
+                    <button id='clear-filter-btn'><i class="fa fa-filter"></i>Clear</button>
                 </div>
-                <div class="select-wrapper">
-                    <label>Hazard Type</label>
-                    <select id="hazard-type">
-                        <option value="Landslides">Landslides</option>
-                        <option value="Tectonic">Tectonic</option>
+                <div id="prospective-data-type" class="data-category">
+                    <label>
+                        <span>Prospective</span>
+                        <div class="material-toggle">
+                    		<input id="prospective-check" type="checkbox"/>
+                    		<label for="prospective-check"></label>
+                        </div>
+                    </label>
+                    <div class="select-wrapper">
+                        <label>Hazard Type</label>
+                        <select class="hazard-type" placeholder="Hazard types" multiple>
+                            <option value="landslides">Landslides</option>
+                            <option value="tectonic">Tectonic</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div id="retrospective-data-category" class="data-category">
+                    <label>
+                        <span>Retrospective</span>
+                        <div class="material-toggle">
+                    		<input id="retrospective-check" type="checkbox"/>
+                    		<label for="retrospective-check"></label>
+                        </div>
+                    </label>
+                    <div class="select-wrapper">
+                        <label>Hazard Type</label>
+                        <select class="hazard-type" placeholder="Hazard types" multiple>
+                            <option value="landslides">Landslides</option>
+                            <option value="tectonic">Tectonic</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="hybrid-data-category" class="data-category">
+                    <label>
+                        <span>Hybrid</span>
+                        <div class="material-toggle">
+                    		<input id="hybrid-check" type="checkbox"/>
+                    		<label for="hybrid-check"></label>
+                        </div>
+                    </label>
+                </div>
+                <div class="select-wrapper" id="country-select-wrapper">
+                    <label>Countries</label>
+                    <select class="countries-select" placeholder="Select Countries" multiple>
                     </select>
                 </div>
-                <div class="select-wrapper">
-                    <label>Countries</label>
-                    <select id="countries-select" placeholder="Select Countries" multiple>
+                <div class="select-wrapper" id="geo-region-select-wrapper">
+                    <label>Geo regions</label>
+                    <select class="geo-region-select" placeholder="Select Geo Regions" multiple>
+                    </select>
+                </div>
+                <div class="select-wrapper" id="income-group-select-wrapper">
+                    <label>Income group</label>
+                    <select class="income-group-select" placeholder="Select Income Groups" multiple>
                     </select>
                 </div>
             </div>
+            <div id="the-map">
+            </div>
         </div>
-        <div id="viewport-graph" class="card">
-            <img src="static/imgs/graph.jpg"></img>
-        </div>
-        <div id="the-map" class="card">
-        </div>
-        <div id="viewport-chart" class="card">
-            <img src="static/imgs/bar.png"></img>
+        <div id="viewports-wrapper">
+            <div id="viewport-graph" class="card">
+                <img src="static/imgs/graph.jpg"></img>
+            </div>
+            <div id="viewport-chart" class="card">
+                <img src="static/imgs/bar.png"></img>
+            </div>
         </div>
     </main>
 </body>

@@ -10,6 +10,8 @@ body {
   body * {
     box-sizing: border-box;
     font-family: 'Open Sans', sans-serif; }
+  body label {
+    -webkit-user-select: none; }
   body h1, body h2, body h3, body h4 {
     margin: 0;
     text-transform: uppercase;
@@ -39,86 +41,140 @@ body {
       box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.3);
       padding: 24px; }
     body main #filter-wrapper {
-      height: calc(60% - 12px);
-      flex-basis: calc(40% - 12px); }
-      body main #filter-wrapper #filter-wrapper-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px; }
-        body main #filter-wrapper #filter-wrapper-header h2 {
-          flex-basis: 40%; }
-        body main #filter-wrapper #filter-wrapper-header #apply-filter-btn {
-          cursor: pointer;
-          background-color: #073861;
-          text-transform: uppercase;
-          border: none;
-          outline: none;
-          color: #fff;
-          font-weight: bold;
-          padding: 6px 24px; }
-      body main #filter-wrapper #filters .radio-btns {
-        width: calc(100% - 32px);
-        margin-bottom: 32px;
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap; }
-        body main #filter-wrapper #filters .radio-btns label {
-          flex-basis: 100%;
-          font-size: 0.8em;
-          text-transform: uppercase;
-          font-weight: 600;
-          color: rgba(0, 0, 0, 0.5);
-          margin-bottom: 6px; }
-        body main #filter-wrapper #filters .radio-btns input {
-          width: 24px;
-          vertical-align: sub; }
-        body main #filter-wrapper #filters .radio-btns .radio-label {
-          margin-bottom: 8px;
-          color: rgba(0, 0, 0, 0.8);
-          font-size: 1em;
-          text-transform: none;
-          margin-bottom: 0;
-          font-weight: 400;
-          cursor: pointer; }
-      body main #filter-wrapper #filters .select-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 32px;
-        z-index: 2; }
-        body main #filter-wrapper #filters .select-wrapper label {
-          flex-basis: 100%;
-          font-size: 0.8em;
-          font-weight: 600;
-          text-transform: uppercase;
-          color: rgba(0, 0, 0, 0.5);
-          margin-bottom: 6px; }
-        body main #filter-wrapper #filters .select-wrapper > div {
-          flex-basis: 100%; }
-    body main #viewport-graph {
-      height: calc(60% - 12px);
-      flex-basis: calc(60% - 12px);
-      display: flex;
-      align-items: center;
-      justify-content: flex-start; }
-      body main #viewport-graph img {
-        height: 95%;
-        width: 95%;
-        object-fit: contain; }
-    body main #the-map {
+      height: calc(100% - 12px);
       flex-basis: calc(40% - 12px);
-      height: calc(40% - 12px);
-      z-index: 1; }
-    body main #viewport-chart {
-      height: calc(40% - 12px);
-      flex-basis: calc(60% - 12px);
       display: flex;
-      align-items: center;
-      justify-content: flex-start; }
-      body main #viewport-chart img {
-        height: 90%;
-        width: 95%;
-        object-fit: contain; }
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      overflow-y: auto; }
+      body main #filter-wrapper #filters {
+        flex-basis: 100%;
+        align-self: flex-start; }
+        body main #filter-wrapper #filters #filter-wrapper-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px; }
+          body main #filter-wrapper #filters #filter-wrapper-header h2 {
+            flex-basis: 40%; }
+          body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn {
+            cursor: pointer;
+            background-color: #073861;
+            text-transform: uppercase;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 6px 16px; }
+            body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn .fa {
+              margin-right: 8px; }
+        body main #filter-wrapper #filters .data-category {
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
+          padding: 10px 24px;
+          margin-left: -24px;
+          margin-right: -24px; }
+          body main #filter-wrapper #filters .data-category > label {
+            display: flex;
+            cursor: pointer;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.8); }
+          body main #filter-wrapper #filters .data-category .material-toggle {
+            min-height: 16px;
+            min-width: 32px; }
+          body main #filter-wrapper #filters .data-category .material-toggle input[type="checkbox"] {
+            display: none; }
+          body main #filter-wrapper #filters .data-category .material-toggle label {
+            cursor: pointer;
+            background-color: #18bc9c;
+            height: 0px;
+            position: relative;
+            width: 32px; }
+          body main #filter-wrapper #filters .data-category .material-toggle > label::before {
+            background: black;
+            box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            content: '';
+            height: 10px;
+            width: 30px;
+            position: absolute;
+            opacity: 0.2;
+            transition: all 0.2s ease-in-out; }
+          body main #filter-wrapper #filters .data-category .material-toggle > label::after {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            content: '';
+            width: 16px;
+            height: 16px;
+            left: 0;
+            position: absolute;
+            top: -3px;
+            transition: all 0.1s ease-in-out; }
+          body main #filter-wrapper #filters .data-category .material-toggle > input[type="checkbox"]:checked + label::before {
+            background: inherit;
+            opacity: 0.5; }
+          body main #filter-wrapper #filters .data-category .material-toggle > input[type="checkbox"]:checked + label::after {
+            background: inherit;
+            left: 14px; }
+          body main #filter-wrapper #filters .data-category#hybrid-data-category {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+            body main #filter-wrapper #filters .data-category#hybrid-data-category label {
+              margin-bottom: 0; }
+        body main #filter-wrapper #filters .select-wrapper {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          margin: 4px 0;
+          z-index: 2; }
+          body main #filter-wrapper #filters .select-wrapper label {
+            flex-basis: 108px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.5);
+            margin-bottom: 6px;
+            flex-grow: 0;
+            flex-shrink: 0; }
+          body main #filter-wrapper #filters .select-wrapper > div {
+            flex-basis: calc(100% - 108px); }
+        body main #filter-wrapper #filters #country-select-wrapper {
+          margin-top: 16px; }
+        body main #filter-wrapper #filters #income-group-select-wrapper {
+          margin-bottom: 16px; }
+      body main #filter-wrapper #the-map {
+        align-self: flex-end;
+        flex-basis: 100%;
+        height: calc(40% - 12px);
+        z-index: 1; }
+    body main #viewports-wrapper {
+      height: calc(100% - 12px);
+      flex-basis: calc(60% - 12px); }
+      body main #viewports-wrapper #viewport-graph {
+        height: calc(60% - 12px);
+        width: 100%;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; }
+        body main #viewports-wrapper #viewport-graph img {
+          height: 100%;
+          width: 100%;
+          object-fit: contain; }
+      body main #viewports-wrapper #viewport-chart {
+        height: 40%;
+        flex-basis: calc(60% - 12px);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; }
+        body main #viewports-wrapper #viewport-chart img {
+          height: 100%;
+          width: 100%;
+          object-fit: contain; }
   @media screen and (max-width: 1366px) {
     body header {
       height: 64px; }
@@ -142,19 +198,15 @@ body {
         margin: 6px 0; }
       body main #filter-wrapper {
         flex-basis: 100%;
-        height: auto;
-        order: 1; }
-      body main #viewport-graph {
-        flex-basis: 100%;
-        height: auto;
-        order: 3; }
-      body main #the-map {
-        flex-basis: 100%;
-        height: 300px;
-        order: 2; }
-      body main #viewport-chart {
-        flex-basis: 100%;
-        height: auto;
-        order: 4; } }
+        height: auto; }
+        body main #filter-wrapper #the-map {
+          flex-basis: 100%;
+          height: 300px; }
+      body main #viewports-wrapper {
+        flex-basis: 100%; }
+        body main #viewports-wrapper #viewport-graph {
+          height: auto; }
+        body main #viewports-wrapper #viewport-chart {
+          height: auto; } }
 
 /*# sourceMappingURL=main.css.map */
