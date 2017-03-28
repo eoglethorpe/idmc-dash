@@ -246,8 +246,8 @@ var DrawBarChart = function(){
                 .attr('class', 'legend')
                 .attr('transform', function(d) {
                     var h = 30;
-                    var x = width*.79;
-                    var y = 80 + index*h;
+                    var x = width*.75;
+                    var y = 50 + index*h;
                 return 'translate(' + x + ',' + y + ')';
             })
 
@@ -298,11 +298,15 @@ var DrawBarChart = function(){
             */
 
         let zoom = d3.zoom()
-            .scaleExtent([1, 40])
+            .scaleExtent([.8, 40])
             .translateExtent([[-100, -100], [width + 90, height + 100]])
             .on("zoom", zoomed);
 
         svg.call(zoom);
+
+        svg.transition()
+              .duration(750)
+              .call(zoom.transform, d3.zoomIdentity.scale(.9).translate(0, 20));
 
         function zoomed() {
           views.forEach(function(view){
@@ -356,7 +360,7 @@ var DrawBarChart = function(){
 
         let xAxis = d3.axisBottom(xScale),
             yAxis = d3.axisLeft(yScale)
-                    .tickSize(-width+padding)
+                    .tickSize(1)
                     .tickFormat(tickFormatLog);
 
         let svg = d3.select(documentId)
@@ -444,6 +448,8 @@ var DrawBarChart = function(){
             .attr("width", function(d){
                 return xScale.bandwidth() - barPadding;
             })
+            .transition()
+            .duration(2000)
             .attr("height", function(d) {
                 if(d.y==0){return d.y;}
                 return height - yScale(d.y) - axisPadding*padding;
@@ -458,45 +464,5 @@ var DrawBarChart = function(){
         d3.select(documentId)
             .append("div")
             .attr("class", "button-wrapper");
-
-        /*
-        let redrawButtonG = d3.select(documentId)
-            .selectAll("div.button-wrapper")
-            .append("button")
-            .text("Redraw")
-            .on("click", function(){
-                return draw(documentId, dataset, barPadding);
-            })
-
-        let resetButtonG = d3.select(documentId)
-            .select(".button-wrapper")
-            .append("button")
-            .text("Reset")
-            .on("click", function(){
-                return resetted();
-            })
-        */
-
-        let zoom = d3.zoom()
-            .scaleExtent([1, 40])
-            .translateExtent([[-100, -100], [width + 90, height + 100]])
-            .on("zoom", zoomed);
-
-        svg.call(zoom);
-
-        function zoomed() {
-          barView.attr("transform", d3.event.transform);
-          gY.call(yAxis.scale(d3.event.transform.rescaleY(yScale)));
-          gX.call(xAxis.scale(xScale.copy().range(
-                xScale.range().map(d3.event.transform.applyX, d3.event.transform))));
-          axisLineDot();
-        }
-
-        function resetted() {
-          svg.transition()
-              .duration(750)
-              .call(zoom.transform, d3.zoomIdentity);
-        }
-
     };
 };

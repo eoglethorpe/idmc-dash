@@ -221,7 +221,7 @@ body {
 .axis path,
 .axis line {
   fill: none;
-  stroke: #777;
+  stroke: #eeebeb;
   stroke-dasharray: "2,2";
   shape-rendering: crispEdges; }
 
