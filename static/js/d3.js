@@ -10,18 +10,18 @@ var DrawBarChart = function(){
         return this;
     };
 
-    colorsLine = [ "rgb(114, 147, 203)", "rgb(225, 151, 76)",
+    var colorsLine = [ "rgb(114, 147, 203)", "rgb(225, 151, 76)",
                        "rgb(132, 186, 91)", "rgb(211, 94, 96)",
                        "rgb(128, 133, 133)", "rgb(144, 103, 167)",
                        "rgb(171, 104, 87)", "rgb(204, 194, 16)"];
 
-    colorsArea = [ "rgb(57, 106, 177)", "rgb(218, 124, 48)",
+    var colorsArea = [ "rgb(57, 106, 177)", "rgb(218, 124, 48)",
                        "rgb(62, 150, 81)", "rgb(204, 37, 41)",
                        "rgb(83, 81, 84)", "rgb(107, 76, 154)",
                        "rgb(146, 36, 40)", "rgb(148, 139, 61)"];
 
 
-    getColor = function(type, index){
+    var getColor = function(type, index){
         if (type == 'area'){
             index = index % colorsArea.length;
             return colorsArea[index];
@@ -31,7 +31,7 @@ var DrawBarChart = function(){
         }
     };
 
-    fadeBar = function(bar){
+    var fadeBar = function(bar){
         bar.attr('old-color', bar.style("fill"));
         let newColor = d3.color(bar.attr('old-color'));
         newColor.g = 150;
@@ -39,26 +39,26 @@ var DrawBarChart = function(){
         bar.style("fill", newColor);
     };
 
-    unFadeBar = function(bar){
+    var unFadeBar = function(bar){
         bar.style("fill", bar.attr('old-color'));
     };
 
-    readablizeNumber = function(number) {
+    var readablizeNumber = function(number) {
         var s = ['', 'k', 'M', 'B'];
         var e = Math.floor(Math.log(number) / Math.log(1000));
         return (number / Math.pow(1000, e)).toFixed(0) + "" + s[e];
     };
 
-    superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
-    powerOfTen = function(d) {
+    var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+    var powerOfTen = function(d) {
           return d / Math.pow(10, Math.ceil(Math.log(d) / Math.LN10 - 1e-12)) === 1;
     };
-    formatPower = function(d) {
+    var formatPower = function(d) {
         return (d + "").split("").map(function(c) {
                 return superscript[c];
             }).join("");
     };
-    tickFormatLog = function(d){
+    var tickFormatLog = function(d){
         if (powerOfTen(d)){
             let tenPower = Math.round(Math.log(d) / Math.LN10),
                 sign = '';
@@ -68,12 +68,47 @@ var DrawBarChart = function(){
         //return d3.format(".1s")(d);
     };
 
-    tickFormat = function(d){
+    var tickFormat = function(d){
         return d3.format(".3s")(d);
         //if (d == 0){ return 0}
         //if (d <= 0){ return '-'+readablizeNumber(d*-1);}
         //return readablizeNumber(d);
     };
+
+        //for showing info on mouse over
+    //
+    var toolTip = d3.select("body")
+                        .append("div")
+                        .attr("class", "tooltip")
+                        .style("opacity", 0);
+
+    var toolTipMouseover = function(d, i){
+        if(d.x && d.y){
+            toolTip
+                .html('X: '+d.x+'<br>Y: <strong>'+d.y+'</strong>')
+                .transition()
+                .duration(200)
+                //.style("background", d3.select(this).style("fill"))
+                .style("opacity", .9)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        };
+        fadeBar(d3.select(this));
+    },
+    toolTipMousemove = function(d, i){
+        if(d.x && d.y){
+            toolTip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+        }
+    },
+    toolTipMouseout = function(d, i){
+        unFadeBar(d3.select(this));
+        if(d.x && d.y){
+            toolTip
+                .transition()
+                .duration(500)
+                .style("opacity", 0);
+        };
+    }
 
     this.drawPath = function(documentId, dataset, labels, errorBand=false, barPadding = 1) {
 
@@ -90,11 +125,6 @@ var DrawBarChart = function(){
             fontSize = ((parent.width()/(4*dataset.length))-barPadding)
                        .toFixed(),
             padding = 30;
-
-        let toolTip = d3.select("body")
-                        .append("div")
-                        .attr("class", "tooltip")
-                        .style("opacity", 0);
 
         // y - axis Value scale
         yScale.domain([0, d3.max(dataset, function(data) {
@@ -173,36 +203,6 @@ var DrawBarChart = function(){
                               .y0(function(d){return yScale(d.y+d.e);})
                               .y1(function(d){return yScale(d.y-d.e);});
 
-        let mouseover = function(d, i){
-            if(d.x && d.y){
-                toolTip
-                    .html('X: '+d.x+'<br>Y: <strong>'+d.y+'</strong>')
-                    .transition()
-                    .duration(200)
-                    //.style("background", d3.select(this).style("fill"))
-                    .style("opacity", .9)
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
-            };
-            fadeBar(d3.select(this));
-        },
-        mousemove = function(d, i){
-            if(d.x && d.y){
-                toolTip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-            }
-        },
-        mouseout = function(d, i){
-            unFadeBar(d3.select(this));
-            if(d.x && d.y){
-                toolTip
-                    .transition()
-                    .duration(500)
-                    .style("opacity", 0);
-            };
-        }
-
-        //used for label
-
         //used by zoom
         let views = [];
         let pathWrapper = svg.append("g");
@@ -238,9 +238,9 @@ var DrawBarChart = function(){
                 .attr("cy", function(d, i) { return yScale(d.y); })
                 .attr("r", 5)
                 .style("fill", getColor('line', index))
-                .on("mouseover", mouseover)
-                .on("mousemove", mousemove)
-                .on("mouseout", mouseout);
+                .on("mouseover", toolTipMouseover)
+                .on("mousemove", toolTipMousemove)
+                .on("mouseout", toolTipMouseout);
 
             legend = legendWrapper.append("g")
                 .attr('class', 'legend')
@@ -340,11 +340,6 @@ var DrawBarChart = function(){
                        .toFixed(),
             padding = 25;
 
-        let toolTip = d3.select("body")
-                        .append("div")
-                        .attr("class", "tooltip")
-                        .style("opacity", 0);
-
         // y - axis Value scale
         yScale.domain([0.1, d3.max(dataset, function(data) {
             return data.y;
@@ -398,34 +393,6 @@ var DrawBarChart = function(){
             .attr('width', width - padding)
             .attr('height', height - 2*padding);
 
-        //for showing info on mouse over
-        let mouseover = function(d, i){
-            if(d.x && d.y){
-                toolTip
-                    .html('X: '+d.x+'<br>Y: <strong>'+d.y+'</strong>')
-                    .transition()
-                    .duration(200)
-                    //.style("background", d3.select(this).style("fill"))
-                    .style("opacity", .9)
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
-            };
-            fadeBar(d3.select(this));
-        },
-        mousemove = function(d, i){
-            if(d.x && d.y){
-                toolTip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-            }
-        },
-        mouseout = function(d, i){
-            unFadeBar(d3.select(this));
-            if(d.x && d.y){
-                toolTip
-                    .transition()
-                    .duration(500)
-                    .style("opacity", 0);
-            };
-        }
         let view = svg.append("g")
                 .attr('class', 'main')
                 .attr('clip-path', 'url(#clip)');
@@ -441,25 +408,29 @@ var DrawBarChart = function(){
             .attr("x", function(d) {
                 return xScale(d.x);
             })
+            .attr("width", function(d){
+                return xScale.bandwidth() - barPadding;
+            })
+            .attr("fill", function(d) {
+                return "#1e88e5";
+            })
+            .on("mouseover", toolTipMouseover)
+            .on("mousemove",toolTipMousemove)
+            .on("mouseout", toolTipMouseout)
+            //.attr("transform", "translate(0, 0)rotate(180)")
+            .attr("y", function(d) {
+                return yScale.range()[0];
+            })
+            .transition()
+            .duration(2000)
             .attr("y", function(d) {
                 if(d.y==0){return d.y;}
                 return yScale(d.y);
             })
-            .attr("width", function(d){
-                return xScale.bandwidth() - barPadding;
-            })
-            .transition()
-            .duration(2000)
             .attr("height", function(d) {
                 if(d.y==0){return d.y;}
                 return height - yScale(d.y) - axisPadding*padding;
-            })
-            .attr("fill", function(d) {
-                return "blue";
-            })
-            .on("mouseover", mouseover)
-            .on("mousemove",mousemove)
-            .on("mouseout", mouseout);
+            });
 
         d3.select(documentId)
             .append("div")
