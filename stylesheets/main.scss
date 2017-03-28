@@ -139,7 +139,8 @@ body{
                         height: 16px;
                         left: 0;
                         position: absolute;
-                        top: -3px;
+                        // top: -3px;
+                        transform: translateY(-3px);
                         transition: all 0.1s ease-in-out;
                     }
                     .material-toggle > input[type="checkbox"]:checked + label::before {
