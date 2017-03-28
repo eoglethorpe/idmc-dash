@@ -209,4 +209,24 @@ body {
         body main #viewports-wrapper #viewport-chart {
           height: auto; } }
 
+.tooltip {
+  z-index: 10;
+  color: white;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.75);
+  border-radius: 6px;
+  font: 12px sans-serif;
+  position: absolute; }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #777;
+  stroke-dasharray: "2,2";
+  shape-rendering: crispEdges; }
+
+.axis text {
+  font-family: sans-serif;
+  font-size: 11px; }
+
 /*# sourceMappingURL=main.css.map */
