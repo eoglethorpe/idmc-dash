@@ -512,7 +512,7 @@ var DrawBarChart = function(){
             .attr('width', labelScale(.9))
             .attr('height', '2px')
             .attr('stroke', function(h, i){
-                return getColor('line', i);
+                //return getColor('line', i);
             })
             .attr('fill', function(h){
                 return getColorForHazard(hazards, h);
@@ -533,11 +533,15 @@ var DrawBarChart = function(){
             .attr("class", "button-wrapper");
 
         let gXSize = gX.selectAll('.tick text').size();
-        if ( gXSize > 30){
+        if ( gXSize > 25){
             gX.selectAll('.tick text')
                 .transition()
                 .duration(2000)
-                .style("font-size", 10 - gXSize/45)
+                .style("font-size", function(){
+                    if (gXSize > 30){
+                        return 1.5*xScale.bandwidth()/d3.select(this).text().length +'px';
+                    }
+                })
                 .attr("transform", "translate(5,10)rotate(45)");
         }
     };
