@@ -96,7 +96,7 @@ var loadRiskModelaad = function(data){
 
 };
 
-var drawAadBar = function(aadModel, hazards, cont){
+var drawAadBar = function(aadModel, hazards, typeList, cont){
     let arrayDataBar = [];
     if( aadModel == undefined ) {
         console.log('Error: Load Risk aad Data is not loaded yet');
@@ -108,7 +108,7 @@ var drawAadBar = function(aadModel, hazards, cont){
         newData.x = k;
         arrayDataBar.push(newData);
     }
-    new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards);
+    new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards, typeList);
 };
 
 var loadAndDrawBarChart = function(){
@@ -130,8 +130,9 @@ var loadAndDrawBarChart = function(){
                         "MUS", "MWI", "ARG"],
                     hazards = [ 'Total', 'Wind', 'Flood', 'Storm',
                                 'Tsunami', 'Tectonic', 'Volcanic',
-                                'Landslides', 'Earthquake', 'Hydrometeorological'];
-                drawAadBar(loadRiskModelaad(data), hazards, cont);
+                                'Landslides', 'Earthquake', 'Hydrometeorological'],
+                typeList = ['Prospective', 'Retrospective', 'Hybrid'];
+                drawAadBar(loadRiskModelaad(data), hazards, typeList, cont);
             }
          });
     });

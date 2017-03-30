@@ -9,17 +9,16 @@ var DrawBarChart = function(){
         };
         return this;
     };
-
     var colorsLine = [ "rgb(114, 147, 203)", "rgb(225, 151, 76)",
                        "rgb(132, 186, 91)", "rgb(211, 94, 96)",
                        "rgb(128, 133, 133)", "rgb(144, 103, 167)",
-                       "rgb(171, 104, 87)", "rgb(204, 194, 16)"];
-
-    var colorsArea = [ "rgb(57, 106, 177)", "rgb(218, 124, 48)",
+                       "rgb(171, 104, 87)", "rgb(204, 194, 16)"],
+        colorsArea = [ "rgb(57, 106, 177)", "rgb(218, 124, 48)",
                        "rgb(62, 150, 81)", "rgb(204, 37, 41)",
                        "rgb(83, 81, 84)", "rgb(107, 76, 154)",
                        "rgb(146, 36, 40)", "rgb(148, 139, 61)",
-                       "rgb(114, 147, 203)", "rgb(225, 151, 76)"];
+                       "rgb(114, 147, 203)", "rgb(225, 151, 76)"],
+        hazardsColor = d3.schemeCategory20c;
 
 
     var getColor = function(type, index){
@@ -33,7 +32,7 @@ var DrawBarChart = function(){
     };
 
     var getColorForHazard = function(hazards, hazard){
-        return colorsArea[hazards.indexOf(hazard)];
+        return hazardsColor[hazards.indexOf(hazard)];
     };
     var fadeBar = function(bar){
         bar.attr('old-color', bar.style("fill"));
@@ -195,7 +194,7 @@ var DrawBarChart = function(){
         // Clipping
         svg.append('defs')
             .append('clipPath')
-            .attr('id', 'clip')
+            .attr('id', 'path-clip')
             .append('rect')
             .attr('x', padding)
             .attr('y', padding)
@@ -222,7 +221,7 @@ var DrawBarChart = function(){
         dataset.forEach(function(dataset, index){
             let view = pathWrapper.append("g")
                 .attr('class', 'main')
-                .attr('clip-path', 'url(#clip)');
+                .attr('clip-path', 'url(#path-clip)');
 
             let pathView = view.append("g");
 
@@ -268,7 +267,7 @@ var DrawBarChart = function(){
                 .style('stroke', getColor('line', index))
                 .on("mouseover", function(){
                     //clipping problem
-                    //view.moveToFront();
+                    view.moveToFront();
                 });
 
             legend.append('text')
@@ -278,7 +277,7 @@ var DrawBarChart = function(){
                 .text(labels[index])
                 .on("mouseover", function(){
                     //clipping problem
-                    //view.moveToFront();
+                    view.moveToFront();
                 });
 
             views.push(pathView)
@@ -286,6 +285,7 @@ var DrawBarChart = function(){
         });
 
         d3.select(documentId)
+            .style('position', 'relative')
             .append("div")
             .attr("class", "button-wrapper");
 
@@ -297,15 +297,7 @@ var DrawBarChart = function(){
             .on("click", function(){
                 return draw(documentId, dataset, barPadding);
             })
-
-        let resetButtonG = d3.select(documentId)
-            .select(".button-wrapper")
-            .append("button")
-            .text("Reset")
-            .on("click", function(){
-                return resetted();
-            })
-            */
+        */
 
         let zoom = d3.zoom()
             .scaleExtent([.8, 40])
@@ -314,10 +306,35 @@ var DrawBarChart = function(){
 
         svg.call(zoom);
 
-        setTimeout(function() {svg.transition()
-              .duration(750)
-              .call(zoom.transform, d3.zoomIdentity.scale(.9).translate(0, 20));
-        }, 1000);
+        d3.select(documentId)
+            .select(".button-wrapper")
+            .append("button")
+            .html('<i class="fa fa-search-plus"></i>')
+            .on("click", function(){
+              svg.transition()
+                  .duration(250)
+                  .call(zoom.scaleBy, 1.3);
+            });
+
+        d3.select(documentId)
+            .select(".button-wrapper")
+            .append("button")
+            .html('<i class="fa fa-search-minus"></i>')
+            .on("click", function(){
+              svg.transition()
+                  .duration(250)
+                  .call(zoom.scaleBy, .7);
+            });
+
+        d3.select(documentId)
+            .select(".button-wrapper")
+            .append("button")
+            .html('<i class="fa fa-undo"></i>')
+            .on("click", function(){
+                resetted();
+            });
+
+        setTimeout(function() {resetted();}, 1000);
 
         function zoomed() {
           views.forEach(function(view){
@@ -331,12 +348,13 @@ var DrawBarChart = function(){
         function resetted() {
           svg.transition()
               .duration(750)
-              .call(zoom.transform, d3.zoomIdentity);
+              .call(zoom.transform, d3.zoomIdentity.scale(.9).translate(0, 20));
+              //.call(zoom.transform, d3.zoomIdentity);
         }
 
     };
 
-    this.drawBar = function(documentId, datasetC, hazards, barPadding = 1) {
+    this.drawBar = function(documentId, datasetC, hazards, showType, barPadding = 1) {
 
         let dataset = datasetC.slice();
         let yScale = d3.scaleLog(),
@@ -413,7 +431,7 @@ var DrawBarChart = function(){
         // Clipping
         svg.append('defs')
             .append('clipPath')
-            .attr('id', 'clip')
+            .attr('id', 'bar-clip')
             .append('rect')
             .attr('x', padding)
             .attr('y', padding)
@@ -422,9 +440,12 @@ var DrawBarChart = function(){
 
         let view = svg.append("g")
                 .attr('class', 'main')
-                .attr('clip-path', 'url(#clip)');
+                .attr('clip-path', 'url(#bar-clip)');
 
-        let type = ['Prospective', 'Retrospective', 'Hybrid'];
+        //Types to show i.e 'Prospective', 'Retrospective', 'Hybrid'
+        if (showType == undefined){
+            showType = ['Prospective', 'Retrospective', 'Hybrid'];
+        };
         // for each data draw bar
         let barView = view.append("g")
             .selectAll("rect")
@@ -432,12 +453,22 @@ var DrawBarChart = function(){
             .enter()
             .selectAll("rect")
             .data(function(data) {
-                let newData = [];
+                let newData = [],
+                    typeList = Object.keys(data);
+                typeList.pop("x")
                 for (let key in data){
-                    if (key == 'x'){continue};
+                    if (key === 'x'){continue};
+                    if (showType.indexOf(key) === -1) {continue;}
+
                     data[key]['x'] = data['x'];
                     data[key]['type'] = key;
+                    // (-1) remove 'x' key
                     data[key]['lenofType'] = Object.keys(data).length-1;
+                    typeList.forEach(function(d, i){
+                        if (showType.indexOf(d) == -1) {
+                            data[key]['lenofType'] -= 1;
+                        }
+                    });
                     newData.push(data[key]);
                 };
                 return newData;
@@ -466,7 +497,7 @@ var DrawBarChart = function(){
             //configure rect
             .attr("x", function(d) {
                 return xScale(d[0].data.x) +
-                    (xScale.bandwidth()/d[0].data.lenofType)*type.indexOf(d[0].data.type);
+                    (xScale.bandwidth()/d[0].data.lenofType)*showType.indexOf(d[0].data.type);
             })
             .attr("width", function(d){
                 return xScale.bandwidth()/d[0].data.lenofType - barPadding;
@@ -527,10 +558,6 @@ var DrawBarChart = function(){
             .attr('y', function(d, i){return -2;})
             .style("font-size", labelScale(hazards.length)/70)
             .text(function(h){return h;});
-
-        d3.select(documentId)
-            .append("div")
-            .attr("class", "button-wrapper");
 
         let gXSize = gX.selectAll('.tick text').size();
         if ( gXSize > 25){
