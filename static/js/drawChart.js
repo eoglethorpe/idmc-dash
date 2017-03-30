@@ -1,3 +1,21 @@
+var csvJSON = function(csv){
+  var lines=csv.split("\n");
+  var result = [];
+  var headers=lines[0].split(",");
+
+  for(var i=1;i<lines.length;i++){
+
+	  var obj = {};
+	  var currentline=lines[i].split(",");
+
+	  for(var j=0;j<headers.length;j++){
+		  obj[headers[j]] = currentline[j];
+	  }
+	  result.push(obj);
+  }
+    return result;
+};
+
 var draw = function() {
     let dataPath = [
             [
@@ -52,33 +70,74 @@ var draw = function() {
         });
     });
 
-    let dataBar = [
-        ['ARG', 3279.820513, 4.884615385, 1044.423077, 0.064102564, 4329.192308],
-        ['COM', 293.6666667, 0, 0, 0, 293.6666667],
-        ['DJI', 0, 0, 0, 0, 0],
-        ['EGY', 0, 597.75, 0, 0, 597.75],
-        ['ETH', 6163.916667, 255.5, 4.111111111, 0, 6423.527778],
-        ['KEN', 8695.4, 99.8, 0, 0, 8795.2],
-        ['MDG', 166208.6364, 0, 0, 0, 166208.6364],
-        ['MLI', 17453.88462, 0, 0, 0, 17453.88462],
-        ['MUS', 46.94736842, 1.789473684, 0, 0, 48.73684211],
-        ['MOZ', 117819.8095, 37.28571429, 71.38095238, 0, 117928.4762],
-        ['MAR', 148, 0, 0, 0, 148],
-        ['NER', 35214.08333, 0, 0, 0, 35214.08333],
-        ['SEN', 219.2, 0, 0, 0, 219.2],
-        ['SLE', 1641.1, 23.1, 0, 0, 1664.2],
-        ['SYC', 0.884615385, 0.769230769, 5.692307692, 0, 7.346153846],
-    ]
-
-    dataBar.forEach(function(datai, i){
-        dataBar[i] = {y: datai[5], x: datai[0]};
-    });
-
     let labels = ["Tectonic", "Landslides", "Hydrometeorological", "TOTAL"];
     new DrawBarChart().init().drawPath("#viewport-graph", dataPath, labels, true);
-    new DrawBarChart().init().drawBar("#viewport-chart", dataBar);
+};
+
+var loadRiskModelaad = function(data){
+    let aadModel = {};
+
+    data = csvJSON(data);
+    data.forEach(function(d){
+        if (aadModel.hasOwnProperty(d.iso3)){
+            if (aadModel[d.iso3].hasOwnProperty(d.analysis_type)){
+                aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+            }else{
+                aadModel[d.iso3][d.analysis_type] = {};
+                aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+            }
+        }else{
+            aadModel[d.iso3] = {};
+            aadModel[d.iso3][d.analysis_type] = {};
+            aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+        }
+    });
+    return aadModel;
+
+};
+
+var drawAadBar = function(aadModel, hazards, cont){
+    let arrayDataBar = [];
+    if( aadModel == undefined ) {
+        console.log('Error: Load Risk aad Data is not loaded yet');
+        return false;
+    };
+    for(let k in aadModel){
+        if(cont.length > 1 && cont.indexOf(k) == -1){continue;};
+        let newData = aadModel[k];
+        newData.x = k;
+        arrayDataBar.push(newData);
+    }
+    new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards);
+};
+
+var loadAndDrawBarChart = function(){
+    $(document).ready(function() {
+        $.ajax({
+            type: "GET",
+            url: "static/data/risk_model_aad.csv",
+            dataType: "text",
+            success: function(data) {
+                let cont =
+                    ["BDI", "BEN", "BFA", "BWA",
+                    "CAF", "CIV", "CMR", "COD",
+                    "COG", "COM", "CPV", "DJI",
+                    "DZA", "EGY", "ERI", "ESH",
+                    "ETH", "GAB", "GHA", "GIN",
+                    "GMB", "GNB", "GNQ", "KEN",
+                    "LBR", "LBY", "LSO", "MAR",
+                    "MDG", "MLI", "MOZ", "MRT",
+                        "MUS", "MWI", "ARG"],
+                    hazards = [ 'Total', 'Wind', 'Flood', 'Storm',
+                                'Tsunami', 'Tectonic', 'Volcanic',
+                                'Landslides', 'Earthquake', 'Hydrometeorological'];
+                drawAadBar(loadRiskModelaad(data), hazards, cont);
+            }
+         });
+    });
 };
 
 $(document).ready(function(){
     draw();
+    loadAndDrawBarChart();
 });

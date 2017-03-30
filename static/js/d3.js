@@ -18,7 +18,8 @@ var DrawBarChart = function(){
     var colorsArea = [ "rgb(57, 106, 177)", "rgb(218, 124, 48)",
                        "rgb(62, 150, 81)", "rgb(204, 37, 41)",
                        "rgb(83, 81, 84)", "rgb(107, 76, 154)",
-                       "rgb(146, 36, 40)", "rgb(148, 139, 61)"];
+                       "rgb(146, 36, 40)", "rgb(148, 139, 61)",
+                       "rgb(114, 147, 203)", "rgb(225, 151, 76)"];
 
 
     var getColor = function(type, index){
@@ -31,6 +32,9 @@ var DrawBarChart = function(){
         }
     };
 
+    var getColorForHazard = function(hazards, hazard){
+        return colorsArea[hazards.indexOf(hazard)];
+    };
     var fadeBar = function(bar){
         bar.attr('old-color', bar.style("fill"));
         let newColor = d3.color(bar.attr('old-color'));
@@ -85,33 +89,39 @@ var DrawBarChart = function(){
     var toolTipMouseover = function(d, i){
         if(d.x && d.y){
             toolTip
-                .html('X: '+d.x+'<br>Y: <strong>'+d.y+'</strong>')
+                .html('X: '+d.x+'<br>Y: <strong>'+d3.format(".3s")(d.y)+'</strong>')
+                //.style("background", d3.select(this).style("fill"))
+        }else if(d[0].data.x){
+            toolTip
+            .html('Country: '+d[0].data.x+
+                  '<br>Type: <strong>'+d[0].data.type+'</strong>'+
+                  '<br>Hazard: <strong>'+d.key+'</strong>'+
+                  '<br>AAD: <strong>'+d3.format(".3s")(d[0][1]-d[0][0])+'</strong>')
+        };
+            toolTip
                 .transition()
                 .duration(200)
-                //.style("background", d3.select(this).style("fill"))
                 .style("opacity", .9)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-        };
+                .style("left", (d3.event.pageX + 10) + "px")
+                .style("top", (d3.event.pageY - 60) + "px")
+                .style("visibility", 'visible');
         fadeBar(d3.select(this));
     },
     toolTipMousemove = function(d, i){
-        if(d.x && d.y){
-            toolTip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-        }
+        toolTip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX+10)+"px");
     },
     toolTipMouseout = function(d, i){
         unFadeBar(d3.select(this));
-        if(d.x && d.y){
-            toolTip
-                .transition()
-                .duration(500)
-                .style("opacity", 0);
-        };
+        toolTip
+            .transition()
+            .duration(100)
+            .style("opacity", 0)
+            .style("visibility", 'hidden');
     }
 
-    this.drawPath = function(documentId, dataset, labels, errorBand=false, barPadding = 1) {
+    this.drawPath = function(documentId, datasetC, labels, errorBand=false, barPadding = 1) {
 
+        let dataset = datasetC.slice();
         dataset.sort(function(d1, d2){return d1.x - d2.x});
 
         let yScale = d3.scaleLinear(),
@@ -245,7 +255,7 @@ var DrawBarChart = function(){
             legend = legendWrapper.append("g")
                 .attr('class', 'legend')
                 .attr('transform', function(d) {
-                    var h = 30;
+                    var h = 15;
                     var x = width*.75;
                     var y = 50 + index*h;
                 return 'translate(' + x + ',' + y + ')';
@@ -264,7 +274,7 @@ var DrawBarChart = function(){
             legend.append('text')
                 .attr('x', 1.5*20)
                 .attr('y', 5)
-                .attr('fontSize', '20px')
+                .attr('font-size', '10px')
                 .text(labels[index])
                 .on("mouseover", function(){
                     //clipping problem
@@ -304,9 +314,10 @@ var DrawBarChart = function(){
 
         svg.call(zoom);
 
-        svg.transition()
+        setTimeout(function() {svg.transition()
               .duration(750)
               .call(zoom.transform, d3.zoomIdentity.scale(.9).translate(0, 20));
+        }, 1000);
 
         function zoomed() {
           views.forEach(function(view){
@@ -325,12 +336,12 @@ var DrawBarChart = function(){
 
     };
 
-    this.drawBar = function(documentId, dataset, barPadding = 1) {
+    this.drawBar = function(documentId, datasetC, hazards, barPadding = 1) {
 
-        dataset.sort(function(d1, d2){return d1.x - d2.x});
-
+        let dataset = datasetC.slice();
         let yScale = d3.scaleLog(),
-            xScale = d3.scaleBand();
+            xScale = d3.scaleBand(),
+            labelScale = d3.scaleLinear();
 
         let axisPadding = 1;
         let parent = $(documentId);
@@ -342,18 +353,34 @@ var DrawBarChart = function(){
 
         // y - axis Value scale
         yScale.domain([0.1, d3.max(dataset, function(data) {
-            return data.y;
+            let max = 0;
+            for(let d in data){
+                if(d == 'x'){continue;}
+                if(data[d]['total'] != undefined){
+                    max = Math.max(max, data[d]['total']);
+                }else{
+                    let newmax = 0;
+                    for(let e in data[d]){
+                        newmax += data[d][e];
+                    }
+                    max = Math.max(max, newmax);
+                }
+            }
+            return max;
         })]);
         // x - axis scale
         xScale.domain(dataset.map(function(d){return d.x;}));
+        labelScale.domain([0, hazards.length]);
 
         yScale.range([height-padding, axisPadding*padding]);
         xScale.range([axisPadding*padding, width], .9);
+        labelScale.range([0, width-padding*3]);
 
         //Clear previous html
         parent.html('');
 
-        let xAxis = d3.axisBottom(xScale),
+        let xAxis = d3.axisBottom(xScale)
+                    .tickSize(-height+2*padding),
             yAxis = d3.axisLeft(yScale)
                     .tickSize(1)
                     .tickFormat(tickFormatLog);
@@ -397,43 +424,121 @@ var DrawBarChart = function(){
                 .attr('class', 'main')
                 .attr('clip-path', 'url(#clip)');
 
+        let type = ['Prospective', 'Retrospective', 'Hybrid'];
         // for each data draw bar
         let barView = view.append("g")
             .selectAll("rect")
             .data(dataset)
             .enter()
+            .selectAll("rect")
+            .data(function(data) {
+                let newData = [];
+                for (let key in data){
+                    if (key == 'x'){continue};
+                    data[key]['x'] = data['x'];
+                    data[key]['type'] = key;
+                    data[key]['lenofType'] = Object.keys(data).length-1;
+                    newData.push(data[key]);
+                };
+                return newData;
+            })
+            .enter()
+            .selectAll("rect")
+            .data(function(data) {
+                let keys = Object.keys(data),
+                    nonKey = ['type', 'x',
+                              'lenofType'];
+                if (keys.length > nonKey.length + 1){
+                    nonKey = nonKey.concat(['Total', 'total']);
+                }
+                keys = keys.filter(function(d){
+                    if (nonKey.indexOf(d) == -1){return true;}
+                    return false;
+                });
+                keys.sort(function(a, b){ return data[a]-data[b]; });
+                return d3.stack().keys(keys)
+                         .order(d3.stackOrderNone)
+                         .offset(d3.stackOffsetNone)([data]);
+            })
+            .enter()
             //create new rect tag
             .append("rect")
             //configure rect
             .attr("x", function(d) {
-                return xScale(d.x);
+                return xScale(d[0].data.x) +
+                    (xScale.bandwidth()/d[0].data.lenofType)*type.indexOf(d[0].data.type);
             })
             .attr("width", function(d){
-                return xScale.bandwidth() - barPadding;
+                return xScale.bandwidth()/d[0].data.lenofType - barPadding;
             })
             .attr("fill", function(d) {
-                return "#1e88e5";
+                return getColorForHazard(hazards, d.key);
             })
             .on("mouseover", toolTipMouseover)
             .on("mousemove",toolTipMousemove)
             .on("mouseout", toolTipMouseout)
-            //.attr("transform", "translate(0, 0)rotate(180)")
             .attr("y", function(d) {
                 return yScale.range()[0];
             })
             .transition()
             .duration(2000)
             .attr("y", function(d) {
-                if(d.y==0){return d.y;}
-                return yScale(d.y);
+                let y1 = d[0][1]==0?0.1:d[0][1];
+                return yScale(y1);
             })
             .attr("height", function(d) {
-                if(d.y==0){return d.y;}
-                return height - yScale(d.y) - axisPadding*padding;
+                let y1 = d[0][1]==0?0.1:d[0][1],
+                    y0 = d[0][0]==0?0.1:d[0][0],
+                    diff = yScale(y0) - yScale(y1)
+                diff = diff<=0?-diff:diff;
+                return diff;
             });
+
+        let legend = svg.append("g")
+                .attr('class', 'legend')
+                .attr('transform', function(d) {
+                    var h = 0;
+                    var x = width*.05;
+                    var y = 10 + h;
+                return 'translate(' + x + ',' + y + ')';
+            })
+
+        legend
+            .selectAll("rect")
+            .data(hazards)
+            .enter()
+            .append('rect')
+            .attr('x', function(d, i){return labelScale(i);})
+            .attr('width', labelScale(.9))
+            .attr('height', '2px')
+            .attr('stroke', function(h, i){
+                return getColor('line', i);
+            })
+            .attr('fill', function(h){
+                return getColorForHazard(hazards, h);
+            });
+
+        legend
+            .selectAll("text")
+            .data(hazards)
+            .enter()
+            .append('text')
+            .attr('x', function(d, i){return labelScale(i);})
+            .attr('y', function(d, i){return -2;})
+            .style("font-size", labelScale(hazards.length)/70)
+            .text(function(h){return h;});
 
         d3.select(documentId)
             .append("div")
             .attr("class", "button-wrapper");
+
+        let gXSize = gX.selectAll('.tick text').size();
+        if ( gXSize > 30){
+            gX.selectAll('.tick text')
+                .transition()
+                .duration(2000)
+                .style("font-size", 10 - gXSize/45)
+                .attr("transform", "translate(5,10)rotate(45)");
+        }
     };
 };
