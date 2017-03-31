@@ -32,7 +32,10 @@
             <div id="filters">
                 <div id="filter-wrapper-header">
                     <h2>Filters</h2>
-                    <button id='clear-filter-btn'><i class="fa fa-filter"></i>Clear</button>
+                    <div>
+                        <button id='clear-filter-btn'><i class="fa fa-filter"></i>Clear</button>
+                        <button id='apply-filter-btn'><i class="fa fa-check"></i>Apply</button>
+                    </div>
                 </div>
                 <div id="prospective-data-type" class="data-category">
                     <label>
@@ -45,13 +48,11 @@
                     <div class="select-wrapper">
                         <label>Hazard Type</label>
                         <select class="hazard-type" placeholder="Hazard types" multiple>
-                            <option value="landslides">Landslides</option>
-                            <option value="tectonic">Tectonic</option>
                         </select>
                     </div>
 
                 </div>
-                <div id="retrospective-data-category" class="data-category">
+                <div id="retrospective-data-type" class="data-category">
                     <label>
                         <span>Retrospective</span>
                         <div class="material-toggle">
@@ -62,8 +63,6 @@
                     <div class="select-wrapper">
                         <label>Hazard Type</label>
                         <select class="hazard-type" placeholder="Hazard types" multiple>
-                            <option value="landslides">Landslides</option>
-                            <option value="tectonic">Tectonic</option>
                         </select>
                     </div>
                 </div>

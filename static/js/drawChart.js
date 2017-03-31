@@ -76,9 +76,20 @@ var draw = function() {
 
 var loadRiskModelaad = function(data){
     let aadModel = {};
+    filters.reset();
 
     data = csvJSON(data);
     data.forEach(function(d){
+        if (!d.analysis_type) {
+            return;
+        }
+
+        d.analysis_type = d.analysis_type.toLowerCase();
+        d.hazard = d.hazard.toLowerCase();
+
+        // Add hazard types to filters
+        filters.addHazardType(d.analysis_type, d.hazard);
+
         if (aadModel.hasOwnProperty(d.iso3)){
             if (aadModel[d.iso3].hasOwnProperty(d.analysis_type)){
                 aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
@@ -92,18 +103,20 @@ var loadRiskModelaad = function(data){
             aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
         }
     });
+
+    filters.reload();
     return aadModel;
 
 };
 
-var drawAadBar = function(aadModel, hazards, typeList, cont){
+var drawAadBar = function(aadModel, hazards, typeList, countries){
     let arrayDataBar = [];
     if( aadModel == undefined ) {
         console.log('Error: Load Risk aad Data is not loaded yet');
         return false;
     };
     for(let k in aadModel){
-        if(cont.length > 1 && cont.indexOf(k) == -1){continue;};
+        if(countries.length > 1 && countries.indexOf(k) == -1){continue;};
         let newData = aadModel[k];
         newData.x = k;
         arrayDataBar.push(newData);
@@ -111,34 +124,38 @@ var drawAadBar = function(aadModel, hazards, typeList, cont){
     new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards, typeList);
 };
 
-var loadAndDrawBarChart = function(){
+var loadAndDrawBarChart = function(countries, hazards, typeList){
     $(document).ready(function() {
         $.ajax({
             type: "GET",
             url: "static/data/risk_model_aad.csv",
             dataType: "text",
             success: function(data) {
-                let cont =
-                    ["BDI", "BEN", "BFA", "BWA",
-                    "CAF", "CIV", "CMR", "COD",
-                    "COG", "COM", "CPV", "DJI",
-                    "DZA", "EGY", "ERI", "ESH",
-                    "ETH", "GAB", "GHA", "GIN",
-                    "GMB", "GNB", "GNQ", "KEN",
-                    "LBR", "LBY", "LSO", "MAR",
-                    "MDG", "MLI", "MOZ", "MRT",
-                        "MUS", "MWI", "ARG"],
-                    hazards = [ 'Total', 'Wind', 'Flood', 'Storm',
-                                'Tsunami', 'Tectonic', 'Volcanic',
-                                'Landslides', 'Earthquake', 'Hydrometeorological'],
-                typeList = ['Prospective', 'Retrospective', 'Hybrid'];
-                drawAadBar(loadRiskModelaad(data), hazards, typeList, cont);
+                drawAadBar(loadRiskModelaad(data), hazards, typeList, countries);
             }
          });
     });
 };
-
 $(document).ready(function(){
+    let countries =
+        ["BDI", "BEN", "BFA", "BWA",
+        "CAF", "CIV", "CMR", "COD",
+        "COG", "COM", "CPV", "DJI",
+        "DZA", "EGY", "ERI", "ESH",
+        "ETH", "GAB", "GHA", "GIN",
+        "GMB", "GNB", "GNQ", "KEN",
+        "LBR", "LBY", "LSO", "MAR",
+        "MDG", "MLI", "MOZ", "MRT",
+            "MUS", "MWI", "ARG"],
+        hazards = [ 'Total', 'Wind', 'Flood', 'Storm',
+                    'Tsunami', 'Tectonic', 'Volcanic',
+                    'Landslides', 'Earthquake', 'Hydrometeorological'],
+    typeList = ['Prospective', 'Retrospective', 'Hybrid'];
     draw();
-    loadAndDrawBarChart();
+    loadAndDrawBarChart(countries, hazards, typeList);
+
+    $('#apply-filter-btn').click(function(){
+        // console.log(filters.getSelectedTypeList());
+        // console.log(filters.getSelectedHazards());
+    });
 });

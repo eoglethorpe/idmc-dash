@@ -58,7 +58,7 @@ body {
           margin-bottom: 24px; }
           body main #filter-wrapper #filters #filter-wrapper-header h2 {
             flex-basis: 40%; }
-          body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn {
+          body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn, body main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn {
             cursor: pointer;
             background-color: #073861;
             text-transform: uppercase;
@@ -67,7 +67,7 @@ body {
             color: #fff;
             font-weight: bold;
             padding: 6px 16px; }
-            body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn .fa {
+            body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn .fa, body main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn .fa {
               margin-right: 8px; }
         body main #filter-wrapper #filters .data-category {
           border-top: 1px solid rgba(0, 0, 0, 0.1);

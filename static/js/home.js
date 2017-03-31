@@ -1,12 +1,9 @@
-let selectedCountries = [
-    'NPL', 'IND', 'AUS', 'MNG', 'CAN'
-];
 let map;
 let countriesGeoData;
 let countriesMapLayer;
 
 function styleMapFeature(feature) {
-    let selected = $('.countries-select').val().indexOf(feature.properties.iso_a3) >= 0;
+    let selected = $('.countries-select').val().indexOf(feature.properties.ISO3) >= 0;
     return {
         fillColor: selected ? '#073861' : '#ecf0f1',
         weight: 1.4,
@@ -19,7 +16,7 @@ function styleMapFeature(feature) {
 
 function onEachMapFeature(feature, layer) {
     $('.countries-select')[0].selectize.addOption({
-        value: feature.properties.iso_a3,
+        value: feature.properties.ISO3,
         text: feature.properties.name,
     });
 }
@@ -35,12 +32,72 @@ function refreshMap() {
     }).addTo(map);
 }
 
+let filters = {
+    init: function() {
+        this.reset();
+        this.reload();
+    },
+
+    reset: function() {
+        this.hazardTypes = {
+            prospective: [],
+            retrospective: [],
+            hybrid: [],
+        };
+    },
+
+    addHazardType: function(analysisType, hazardType) {
+        if (analysisType) {
+            if (filters.hazardTypes[analysisType].indexOf(hazardType) < 0) {
+                filters.hazardTypes[analysisType].push(hazardType);
+            }
+        }
+    },
+
+    reload: function() {
+        let prospective = $('#prospective-data-type .hazard-type')[0].selectize;
+        prospective.clearOptions();
+        this.hazardTypes.prospective.forEach(function(type) {
+            prospective.addOption({ value: type, text: type });
+        });
+
+
+        let retrospective = $('#retrospective-data-type .hazard-type')[0].selectize;
+        retrospective.clearOptions();
+        this.hazardTypes.retrospective.forEach(function(type) {
+            retrospective.addOption({ value: type, text: type });
+        });
+    },
+
+    getSelectedHazards: function() {
+        return {
+            prospective: $('#prospective-data-type .hazard-type').val(),
+            retrospective: $('#retrospective-data-type .hazard-type').val(),
+            hybrid: [],
+        }
+    },
+    getSelectedTypeList: function() {
+        let typeList = [];
+        if($('#prospective-check').is(':checked')){
+            typeList.push('prospective');
+        }
+        if($('#retrospective-check').is(':checked')){
+            typeList.push('retrospective');
+        }
+        if($('#hybrid-check').is(':checked')){
+            typeList.push('hybrid');
+        }
+        return typeList;
+    },
+};
+
 $(document).ready(function(){
 
     $('.hazard-type').selectize();
     $('.countries-select').selectize();
     $('.geo-region-select').selectize();
     $('.income-group-select').selectize();
+    filters.init();
 
     $('.countries-select').on('change', function() {
         refreshMap();
@@ -55,7 +112,7 @@ $(document).ready(function(){
     map.on('blur', function() { map.scrollWheelZoom.disable(); });
 
     // Load countries geojson in the map
-    $.getJSON('static/countries.geo.json', function(data) {
+    $.getJSON('static/countries.json', function(data) {
         countriesGeoData = data;
         refreshMap();
     });
