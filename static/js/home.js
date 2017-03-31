@@ -1,6 +1,7 @@
 let map;
 let countriesGeoData;
 let countriesMapLayer;
+let aadDataModel;
 
 function styleMapFeature(feature) {
     let selected = $('.countries-select').val().indexOf(feature.properties.ISO3) >= 0;
@@ -73,7 +74,7 @@ let filters = {
         return {
             prospective: $('#prospective-data-type .hazard-type').val(),
             retrospective: $('#retrospective-data-type .hazard-type').val(),
-            hybrid: [],
+            hybrid: ['total'],
         }
     },
     getSelectedTypeList: function() {

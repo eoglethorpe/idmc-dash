@@ -7,6 +7,11 @@ var DrawBarChart = function(){
             this.parentNode.appendChild(this);
           });
         };
+
+        String.prototype.toProperCase = function () {
+            return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        };
+
         return this;
     };
     var colorsLine = [ "rgb(114, 147, 203)", "rgb(225, 151, 76)",
@@ -31,9 +36,10 @@ var DrawBarChart = function(){
         }
     };
 
-    var getColorForHazard = function(hazards, type, hazard){
-        return hazardsColor[hazards[type].indexOf(hazard)];
+    var getColorForHazard = function(hazards, hazard){
+        return hazardsColor[hazards.indexOf(hazard.toLowerCase())];
     };
+
     var fadeBar = function(bar){
         bar.attr('old-color', bar.style("fill"));
         let newColor = d3.color(bar.attr('old-color'));
@@ -93,8 +99,8 @@ var DrawBarChart = function(){
         }else if(d[0].data.x){
             toolTip
             .html('Country: '+d[0].data.x+
-                  '<br>Type: <strong>'+d[0].data.type+'</strong>'+
-                  '<br>Hazard: <strong>'+d.key+'</strong>'+
+                  '<br>Type: <strong>'+d[0].data.type.toProperCase()+'</strong>'+
+                  '<br>Hazard: <strong>'+d.key.toProperCase()+'</strong>'+
                   '<br>AAD: <strong>'+d3.format(".3s")(d[0][1]-d[0][0])+'</strong>')
         };
             toolTip
@@ -388,12 +394,17 @@ var DrawBarChart = function(){
         })]);
         // x - axis scale
         xScale.domain(dataset.map(function(d){return d.x;}));
-        labelScale.domain([].concat.apply([], (Object.keys(hazards).map(function(d){
-                                return hazards[d];}))));
+        // label - axis scale
+        labelScale.domain(
+            [].concat.apply([],
+                (Object.keys(hazards).map(function(d){
+                    return hazards[d];
+                })))
+        );
 
         yScale.range([height-padding, axisPadding*padding]);
         xScale.range([axisPadding*padding, width], .9);
-        labelScale.range([0, width-padding*3]);
+        labelScale.range([-30, width-padding]);
 
         //Clear previous html
         parent.html('');
@@ -446,7 +457,7 @@ var DrawBarChart = function(){
         //Types to show i.e 'Prospective', 'Retrospective', 'Hybrid'
         //TODO: use lowercase with searching
         if (showType == undefined){
-            showType = ['Prospective', 'Retrospective', 'Hybrid'];
+            showType = ['prospective', 'retrospective', 'hybrid'];
         };
         // for each data draw bar
         let barView = view.append("g")
@@ -460,18 +471,19 @@ var DrawBarChart = function(){
                 typeList.pop("x")
                 for (let key in data){
                     if (key === 'x'){continue};
-                    if (showType.indexOf(key) === -1) {continue;}
+                    if (showType.indexOf(key.toLowerCase()) === -1) {continue;}
+                    let newType = $.extend(true, {}, data[key]);
 
-                    data[key]['x'] = data['x'];
-                    data[key]['type'] = key;
+                    newType['x'] = data['x'];
+                    newType['type'] = key;
                     // (-1) remove 'x' key
-                    data[key]['lenofType'] = Object.keys(data).length-1;
+                    newType['lenofType'] = Object.keys(data).length-1;
                     typeList.forEach(function(d, i){
-                        if (showType.indexOf(d) == -1) {
-                            data[key]['lenofType'] -= 1;
+                        if (showType.indexOf(d.toLowerCase()) == -1) {
+                            newType['lenofType'] -= 1;
                         }
                     });
-                    newData.push(data[key]);
+                    newData.push(newType);
                 };
                 return newData;
             })
@@ -482,11 +494,11 @@ var DrawBarChart = function(){
                     nonKey = ['type', 'x',
                               'lenofType'];
                 if (keys.length > nonKey.length + 1){
-                    nonKey = nonKey.concat(['Total', 'total']);
+                    nonKey.push('total');
                 }
                 keys = keys.filter(function(d){
-                    if (nonKey.indexOf(d) == -1){
-                        if (hazards[data.type].indexOf(d) == -1){return false;}
+                    if (nonKey.indexOf(d.toLowerCase()) == -1){
+                        if (hazards[data.type].indexOf(d.toLowerCase()) == -1){return false;}
                         return true;
                     }
                     return false;
@@ -502,13 +514,13 @@ var DrawBarChart = function(){
             //configure rect
             .attr("x", function(d) {
                 return xScale(d[0].data.x) +
-                    (xScale.bandwidth()/d[0].data.lenofType)*showType.indexOf(d[0].data.type);
+                    (xScale.bandwidth()/d[0].data.lenofType)*showType.indexOf(d[0].data.type.toLowerCase());
             })
             .attr("width", function(d){
                 return xScale.bandwidth()/d[0].data.lenofType - barPadding;
             })
             .attr("fill", function(d) {
-                return getColorForHazard(hazards,d[0].data.type, d.key);
+                return getColorForHazard(labelScale.domain(), d.key);
             })
             .on("mouseover", toolTipMouseover)
             .on("mousemove",toolTipMousemove)
@@ -544,14 +556,14 @@ var DrawBarChart = function(){
             .data(labelScale.domain())
             .enter()
             .append('rect')
-            .attr('x', function(d){return labelScale(d)-5;})
-            .attr('width', labelScale.bandwidth()-1)
+            .attr('x', function(d){return labelScale(d);})
+            .attr('width', labelScale.bandwidth()-2)
             .attr('height', '2px')
             .attr('stroke', function(h, i){
                 //return getColor('line', i);
             })
             .attr('fill', function(h){
-                return getColorForHazard(hazards, 'Prospective', h);
+                return getColorForHazard(labelScale.domain(), h);
             });
 
         legend
@@ -559,12 +571,12 @@ var DrawBarChart = function(){
             .data(labelScale.domain())
             .enter()
             .append('text')
-            .attr('x', function(d){return labelScale(d)-5;})
+            .attr('x', function(d){return labelScale(d);})
             .attr('y', function(d){return -2;})
             .style("font-size", function(d){
-                return labelScale.bandwidth()/10;
+                return Math.min(labelScale.bandwidth()/11, 15);
             })
-            .text(function(d){return d;});
+            .text(function(d){return d.toProperCase();});
 
         let gXSize = gX.selectAll('.tick text').size();
         if ( gXSize > 25){
