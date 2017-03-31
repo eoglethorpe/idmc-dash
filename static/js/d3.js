@@ -101,7 +101,8 @@ var DrawBarChart = function(){
             .html('Country: '+d[0].data.x+
                   '<br>Type: <strong>'+d[0].data.type.toProperCase()+'</strong>'+
                   '<br>Hazard: <strong>'+d.key.toProperCase()+'</strong>'+
-                  '<br>AAD: <strong>'+d3.format(".3s")(d[0][1]-d[0][0])+'</strong>')
+                  '<br>AAD: <strong>'+d3.format(".3s")
+                    (d.skip?d.d:d[0][1]-d[0][0])+'</strong>')
         };
             toolTip
                 .transition()
@@ -492,9 +493,11 @@ var DrawBarChart = function(){
             .data(function(data) {
                 let keys = Object.keys(data),
                     nonKey = ['type', 'x',
-                              'lenofType'];
+                              'lenofType'],
+                    skipTotal = false;
                 if (keys.length > nonKey.length + 1){
                     nonKey.push('total');
+                    if (data.hasOwnProperty('total')) {skipTotal = true;}
                 }
                 keys = keys.filter(function(d){
                     if (nonKey.indexOf(d.toLowerCase()) == -1){
@@ -504,9 +507,13 @@ var DrawBarChart = function(){
                     return false;
                 });
                 keys.sort(function(a, b){ return data[a]-data[b]; });
-                return d3.stack().keys(keys)
-                         .order(d3.stackOrderNone)
-                         .offset(d3.stackOffsetNone)([data]);
+                let newDataset =  d3.stack().keys(keys)
+                                    .order(d3.stackOrderNone)
+                                    .offset(d3.stackOffsetNone)([data]);
+                if (skipTotal){
+                    newDataset.splice(0, 0, {d:data['total'], key:'total', skip: true, 0:{'data': data}});
+                }
+                return newDataset;
             })
             .enter()
             //create new rect tag
@@ -531,10 +538,16 @@ var DrawBarChart = function(){
             .transition()
             .duration(2000)
             .attr("y", function(d) {
+                if(d.key.toLowerCase() === 'total' && d.skip === true){
+                    return yScale(d.d==0?0.1:d.d);
+                }
                 let y1 = d[0][1]==0?0.1:d[0][1];
                 return yScale(y1);
             })
             .attr("height", function(d) {
+                if(d.key.toLowerCase() === 'total' && d.skip === true){
+                    return yScale(0.1) - yScale(d.d==0?0.1:d.d);
+                }
                 let y1 = d[0][1]==0?0.1:d[0][1],
                     y0 = d[0][0]==0?0.1:d[0][0],
                     diff = yScale(y0) - yScale(y1)
