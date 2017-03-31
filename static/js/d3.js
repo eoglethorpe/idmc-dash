@@ -31,8 +31,8 @@ var DrawBarChart = function(){
         }
     };
 
-    var getColorForHazard = function(hazards, hazard){
-        return hazardsColor[hazards.indexOf(hazard)];
+    var getColorForHazard = function(hazards, type, hazard){
+        return hazardsColor[hazards[type].indexOf(hazard)];
     };
     var fadeBar = function(bar){
         bar.attr('old-color', bar.style("fill"));
@@ -359,7 +359,7 @@ var DrawBarChart = function(){
         let dataset = datasetC.slice();
         let yScale = d3.scaleLog(),
             xScale = d3.scaleBand(),
-            labelScale = d3.scaleLinear();
+            labelScale = d3.scaleBand();
 
         let axisPadding = 1;
         let parent = $(documentId);
@@ -388,7 +388,8 @@ var DrawBarChart = function(){
         })]);
         // x - axis scale
         xScale.domain(dataset.map(function(d){return d.x;}));
-        labelScale.domain([0, hazards.length]);
+        labelScale.domain([].concat.apply([], (Object.keys(hazards).map(function(d){
+                                return hazards[d];}))));
 
         yScale.range([height-padding, axisPadding*padding]);
         xScale.range([axisPadding*padding, width], .9);
@@ -443,6 +444,7 @@ var DrawBarChart = function(){
                 .attr('clip-path', 'url(#bar-clip)');
 
         //Types to show i.e 'Prospective', 'Retrospective', 'Hybrid'
+        //TODO: use lowercase with searching
         if (showType == undefined){
             showType = ['Prospective', 'Retrospective', 'Hybrid'];
         };
@@ -483,7 +485,10 @@ var DrawBarChart = function(){
                     nonKey = nonKey.concat(['Total', 'total']);
                 }
                 keys = keys.filter(function(d){
-                    if (nonKey.indexOf(d) == -1){return true;}
+                    if (nonKey.indexOf(d) == -1){
+                        if (hazards[data.type].indexOf(d) == -1){return false;}
+                        return true;
+                    }
                     return false;
                 });
                 keys.sort(function(a, b){ return data[a]-data[b]; });
@@ -503,7 +508,7 @@ var DrawBarChart = function(){
                 return xScale.bandwidth()/d[0].data.lenofType - barPadding;
             })
             .attr("fill", function(d) {
-                return getColorForHazard(hazards, d.key);
+                return getColorForHazard(hazards,d[0].data.type, d.key);
             })
             .on("mouseover", toolTipMouseover)
             .on("mousemove",toolTipMousemove)
@@ -536,28 +541,30 @@ var DrawBarChart = function(){
 
         legend
             .selectAll("rect")
-            .data(hazards)
+            .data(labelScale.domain())
             .enter()
             .append('rect')
-            .attr('x', function(d, i){return labelScale(i);})
-            .attr('width', labelScale(.9))
+            .attr('x', function(d){return labelScale(d)-5;})
+            .attr('width', labelScale.bandwidth()-1)
             .attr('height', '2px')
             .attr('stroke', function(h, i){
                 //return getColor('line', i);
             })
             .attr('fill', function(h){
-                return getColorForHazard(hazards, h);
+                return getColorForHazard(hazards, 'Prospective', h);
             });
 
         legend
             .selectAll("text")
-            .data(hazards)
+            .data(labelScale.domain())
             .enter()
             .append('text')
-            .attr('x', function(d, i){return labelScale(i);})
-            .attr('y', function(d, i){return -2;})
-            .style("font-size", labelScale(hazards.length)/70)
-            .text(function(h){return h;});
+            .attr('x', function(d){return labelScale(d)-5;})
+            .attr('y', function(d){return -2;})
+            .style("font-size", function(d){
+                return labelScale.bandwidth()/10;
+            })
+            .text(function(d){return d;});
 
         let gXSize = gX.selectAll('.tick text').size();
         if ( gXSize > 25){
