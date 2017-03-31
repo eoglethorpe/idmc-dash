@@ -413,6 +413,7 @@ var DrawBarChart = function(){
         let xAxis = d3.axisBottom(xScale)
                     .tickSize(-height+2*padding),
             yAxis = d3.axisLeft(yScale)
+                    //.tickSize(-width+padding)
                     .tickSize(1)
                     .tickFormat(tickFormatLog);
 
@@ -497,7 +498,9 @@ var DrawBarChart = function(){
                     skipTotal = false;
                 if (keys.length > nonKey.length + 1){
                     nonKey.push('total');
-                    if (data.hasOwnProperty('total')) {skipTotal = true;}
+                    if (data.hasOwnProperty('total') && hazards[data.type].indexOf('total') != -1){
+                        skipTotal = true;
+                    }
                 }
                 keys = keys.filter(function(d){
                     if (nonKey.indexOf(d.toLowerCase()) == -1){
