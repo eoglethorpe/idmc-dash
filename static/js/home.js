@@ -17,7 +17,7 @@ function styleMapFeature(feature) {
 function onEachMapFeature(feature, layer) {
     $('.countries-select')[0].selectize.addOption({
         value: feature.properties.ISO3,
-        text: feature.properties.name,
+        text: feature.properties.English,
     });
 }
 
@@ -112,7 +112,7 @@ $(document).ready(function(){
     map.on('blur', function() { map.scrollWheelZoom.disable(); });
 
     // Load countries geojson in the map
-    $.getJSON('static/countries.json', function(data) {
+    $.getJSON('static/countires.geojson', function(data) {
         countriesGeoData = data;
         refreshMap();
     });
