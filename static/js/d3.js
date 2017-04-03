@@ -7,6 +7,11 @@ var DrawBarChart = function(){
             this.parentNode.appendChild(this);
           });
         };
+
+        String.prototype.toProperCase = function () {
+            return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+        };
+
         return this;
     };
     var colorsLine = [ "rgb(114, 147, 203)", "rgb(225, 151, 76)",
@@ -32,8 +37,9 @@ var DrawBarChart = function(){
     };
 
     var getColorForHazard = function(hazards, hazard){
-        return hazardsColor[hazards.indexOf(hazard)];
+        return hazardsColor[hazards.indexOf(hazard.toLowerCase())];
     };
+
     var fadeBar = function(bar){
         bar.attr('old-color', bar.style("fill"));
         let newColor = d3.color(bar.attr('old-color'));
@@ -93,9 +99,10 @@ var DrawBarChart = function(){
         }else if(d[0].data.x){
             toolTip
             .html('Country: '+d[0].data.x+
-                  '<br>Type: <strong>'+d[0].data.type+'</strong>'+
-                  '<br>Hazard: <strong>'+d.key+'</strong>'+
-                  '<br>AAD: <strong>'+d3.format(".3s")(d[0][1]-d[0][0])+'</strong>')
+                  '<br>Type: <strong>'+d[0].data.type.toProperCase()+'</strong>'+
+                  '<br>Hazard: <strong>'+d.key.toProperCase()+'</strong>'+
+                  '<br>AAD: <strong>'+d3.format(".3s")
+                    (d.skip?d.d:d[0][1]-d[0][0])+'</strong>')
         };
             toolTip
                 .transition()
@@ -359,7 +366,7 @@ var DrawBarChart = function(){
         let dataset = datasetC.slice();
         let yScale = d3.scaleLog(),
             xScale = d3.scaleBand(),
-            labelScale = d3.scaleLinear();
+            labelScale = d3.scaleBand();
 
         let axisPadding = 1;
         let parent = $(documentId);
@@ -388,11 +395,17 @@ var DrawBarChart = function(){
         })]);
         // x - axis scale
         xScale.domain(dataset.map(function(d){return d.x;}));
-        labelScale.domain([0, hazards.length]);
+        // label - axis scale
+        labelScale.domain(
+            [].concat.apply([],
+                (Object.keys(hazards).map(function(d){
+                    return hazards[d];
+                })))
+        );
 
         yScale.range([height-padding, axisPadding*padding]);
         xScale.range([axisPadding*padding, width], .9);
-        labelScale.range([0, width-padding*3]);
+        labelScale.range([-30, width-padding]);
 
         //Clear previous html
         parent.html('');
@@ -400,6 +413,7 @@ var DrawBarChart = function(){
         let xAxis = d3.axisBottom(xScale)
                     .tickSize(-height+2*padding),
             yAxis = d3.axisLeft(yScale)
+                    //.tickSize(-width+padding)
                     .tickSize(1)
                     .tickFormat(tickFormatLog);
 
@@ -443,8 +457,9 @@ var DrawBarChart = function(){
                 .attr('clip-path', 'url(#bar-clip)');
 
         //Types to show i.e 'Prospective', 'Retrospective', 'Hybrid'
+        //TODO: use lowercase with searching
         if (showType == undefined){
-            showType = ['Prospective', 'Retrospective', 'Hybrid'];
+            showType = ['prospective', 'retrospective', 'hybrid'];
         };
         // for each data draw bar
         let barView = view.append("g")
@@ -458,18 +473,19 @@ var DrawBarChart = function(){
                 typeList.pop("x")
                 for (let key in data){
                     if (key === 'x'){continue};
-                    if (showType.indexOf(key) === -1) {continue;}
+                    if (showType.indexOf(key.toLowerCase()) === -1) {continue;}
+                    let newType = $.extend(true, {}, data[key]);
 
-                    data[key]['x'] = data['x'];
-                    data[key]['type'] = key;
+                    newType['x'] = data['x'];
+                    newType['type'] = key;
                     // (-1) remove 'x' key
-                    data[key]['lenofType'] = Object.keys(data).length-1;
+                    newType['lenofType'] = Object.keys(data).length-1;
                     typeList.forEach(function(d, i){
-                        if (showType.indexOf(d) == -1) {
-                            data[key]['lenofType'] -= 1;
+                        if (showType.indexOf(d.toLowerCase()) == -1) {
+                            newType['lenofType'] -= 1;
                         }
                     });
-                    newData.push(data[key]);
+                    newData.push(newType);
                 };
                 return newData;
             })
@@ -478,18 +494,29 @@ var DrawBarChart = function(){
             .data(function(data) {
                 let keys = Object.keys(data),
                     nonKey = ['type', 'x',
-                              'lenofType'];
+                              'lenofType'],
+                    skipTotal = false;
                 if (keys.length > nonKey.length + 1){
-                    nonKey = nonKey.concat(['Total', 'total']);
+                    nonKey.push('total');
+                    if (data.hasOwnProperty('total') && hazards[data.type].indexOf('total') != -1){
+                        skipTotal = true;
+                    }
                 }
                 keys = keys.filter(function(d){
-                    if (nonKey.indexOf(d) == -1){return true;}
+                    if (nonKey.indexOf(d.toLowerCase()) == -1){
+                        if (hazards[data.type].indexOf(d.toLowerCase()) == -1){return false;}
+                        return true;
+                    }
                     return false;
                 });
                 keys.sort(function(a, b){ return data[a]-data[b]; });
-                return d3.stack().keys(keys)
-                         .order(d3.stackOrderNone)
-                         .offset(d3.stackOffsetNone)([data]);
+                let newDataset =  d3.stack().keys(keys)
+                                    .order(d3.stackOrderNone)
+                                    .offset(d3.stackOffsetNone)([data]);
+                if (skipTotal){
+                    newDataset.splice(0, 0, {d:data['total'], key:'total', skip: true, 0:{'data': data}});
+                }
+                return newDataset;
             })
             .enter()
             //create new rect tag
@@ -497,13 +524,13 @@ var DrawBarChart = function(){
             //configure rect
             .attr("x", function(d) {
                 return xScale(d[0].data.x) +
-                    (xScale.bandwidth()/d[0].data.lenofType)*showType.indexOf(d[0].data.type);
+                    (xScale.bandwidth()/d[0].data.lenofType)*showType.indexOf(d[0].data.type.toLowerCase());
             })
             .attr("width", function(d){
                 return xScale.bandwidth()/d[0].data.lenofType - barPadding;
             })
             .attr("fill", function(d) {
-                return getColorForHazard(hazards, d.key);
+                return getColorForHazard(labelScale.domain(), d.key);
             })
             .on("mouseover", toolTipMouseover)
             .on("mousemove",toolTipMousemove)
@@ -514,10 +541,16 @@ var DrawBarChart = function(){
             .transition()
             .duration(2000)
             .attr("y", function(d) {
+                if(d.key.toLowerCase() === 'total' && d.skip === true){
+                    return yScale(d.d==0?0.1:d.d);
+                }
                 let y1 = d[0][1]==0?0.1:d[0][1];
                 return yScale(y1);
             })
             .attr("height", function(d) {
+                if(d.key.toLowerCase() === 'total' && d.skip === true){
+                    return yScale(0.1) - yScale(d.d==0?0.1:d.d);
+                }
                 let y1 = d[0][1]==0?0.1:d[0][1],
                     y0 = d[0][0]==0?0.1:d[0][0],
                     diff = yScale(y0) - yScale(y1)
@@ -536,28 +569,30 @@ var DrawBarChart = function(){
 
         legend
             .selectAll("rect")
-            .data(hazards)
+            .data(labelScale.domain())
             .enter()
             .append('rect')
-            .attr('x', function(d, i){return labelScale(i);})
-            .attr('width', labelScale(.9))
+            .attr('x', function(d){return labelScale(d);})
+            .attr('width', labelScale.bandwidth()-2)
             .attr('height', '2px')
             .attr('stroke', function(h, i){
                 //return getColor('line', i);
             })
             .attr('fill', function(h){
-                return getColorForHazard(hazards, h);
+                return getColorForHazard(labelScale.domain(), h);
             });
 
         legend
             .selectAll("text")
-            .data(hazards)
+            .data(labelScale.domain())
             .enter()
             .append('text')
-            .attr('x', function(d, i){return labelScale(i);})
-            .attr('y', function(d, i){return -2;})
-            .style("font-size", labelScale(hazards.length)/70)
-            .text(function(h){return h;});
+            .attr('x', function(d){return labelScale(d);})
+            .attr('y', function(d){return -2;})
+            .style("font-size", function(d){
+                return Math.min(labelScale.bandwidth()/11, 15);
+            })
+            .text(function(d){return d.toProperCase();});
 
         let gXSize = gX.selectAll('.tick text').size();
         if ( gXSize > 25){
