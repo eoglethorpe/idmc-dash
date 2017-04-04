@@ -92,9 +92,18 @@ var DrawBarChart = function(){
                         .style("opacity", 0);
 
     var toolTipMouseover = function(d, i){
-        if(d.x && d.y){
+        if(d.displacement && d.frequency){
             toolTip
-                .html('X: '+d.x+'<br>Y: <strong>'+d3.format(".3s")(d.y)+'</strong>')
+                .html('Displacement(X): <strong>'+d3.format(".3s")(d.displacement)+'</strong>'+
+                      '<br>Frequency(Y): <strong>'+d3.format(".3s")(d.frequency)+'</strong>'+
+                      '<br>Country: <strong>'+d.data.country.toUpperCase()+'</strong>'+
+                      '<br>Type: <strong>'+d.data.type.toProperCase()+'</strong>'+
+                      '<br>Hazard: <strong>'+d.data.hazard.toProperCase()+'</strong>')
+            if(d.hasOwnProperty('displacement_stat_error')){
+                toolTip.html(toolTip.html()+
+                      '<br>Error: <strong>'+d3.format(".3s")(d.displacement_stat_error)+'</strong>'
+                );
+            }
                 //.style("background", d3.select(this).style("fill"))
         }else if(d[0].data.x){
             toolTip
@@ -125,10 +134,7 @@ var DrawBarChart = function(){
             .style("visibility", 'hidden');
     }
 
-    this.drawPath = function(documentId, datasetC, labels, errorBand=false, barPadding = 1) {
-
-        let dataset = datasetC.slice();
-        dataset.sort(function(d1, d2){return d1.x - d2.x});
+    this.drawPath = function(documentId, dataset, hazards, showType, countries, barPadding = 1) {
 
         let yScale = d3.scaleLinear(),
             xScale = d3.scaleLog(),
@@ -138,20 +144,26 @@ var DrawBarChart = function(){
         let parent = $(documentId);
         let width = parent.width(),
             height = parent.height(),
-            fontSize = ((parent.width()/(4*dataset.length))-barPadding)
-                       .toFixed(),
             padding = 30;
 
         // y - axis Value scale
-        yScale.domain([0, d3.max(dataset, function(data) {
-                return d3.max(data, function(data){
-                    return data.y;
+        yScale.domain([0, d3.max(Object.keys(dataset), function(dataC) {
+                return d3.max(Object.keys(dataset[dataC]), function(dataA){
+                    return d3.max(Object.keys(dataset[dataC][dataA]), function(dataH){
+                        return d3.max(dataset[dataC][dataA][dataH], function(data){
+                            return data.frequency; // y-axis
+                        })
+                    })
                 })
         })]);
         // x - axis scale
-        xScale.domain([0.1, d3.max(dataset, function(data) {
-                return d3.max(data, function(data){
-                    return data.x;
+        xScale.domain([0.1, d3.max(Object.keys(dataset), function(dataC) {
+                return d3.max(Object.keys(dataset[dataC]), function(dataA){
+                    return d3.max(Object.keys(dataset[dataC][dataA]), function(dataH){
+                        return d3.max(dataset[dataC][dataA][dataH], function(data){
+                            return data.displacement; // x-axis
+                        })
+                    })
                 })
         })]);
 
@@ -210,14 +222,14 @@ var DrawBarChart = function(){
 
         var lineFunction = d3.line()
                              .x(function(d, i) {
-                                 return xScale(d.x);
+                                 return xScale(d.displacement);
                              })
-                             .y(function(d, i) { return yScale(d.y); })
+                             .y(function(d, i) { return yScale(d.frequency); })
 
         var CAreaFunction = d3.area()
-                              .x(function(d){return xScale(d.x);})
-                              .y0(function(d){return yScale(d.y+d.e);})
-                              .y1(function(d){return yScale(d.y-d.e);});
+                              .x(function(d){return xScale(d.displacement);})
+                              .y0(function(d){return yScale(d.frequency+d.displacement_stat_error*5);})
+                              .y1(function(d){return yScale(d.frequency-d.displacement_stat_error*5);});
 
         //used by zoom
         let views = [];
@@ -225,71 +237,89 @@ var DrawBarChart = function(){
         let legendWrapper = svg.append("g");
 
         // for each data draw lines and area
-        dataset.forEach(function(dataset, index){
-            let view = pathWrapper.append("g")
-                .attr('class', 'main')
-                .attr('clip-path', 'url(#path-clip)');
+        for(var keyC in dataset){
+            if (countries.indexOf(keyC) == -1 ){continue;}
+            for(var keyA in dataset[keyC]){
+                if (showType.indexOf(keyA) == -1 ){continue;}
+                for(var keyH in dataset[keyC][keyA]){
+                    if (hazards[keyA].indexOf(keyH) == -1 ){continue;}
+                    let datasetH = dataset[keyC][keyA][keyH];
+                    let view = pathWrapper.append("g")
+                        .attr('class', 'main')
+                        .attr('clip-path', 'url(#path-clip)'),
+                        index = 1;
 
-            let pathView = view.append("g");
+                    let pathView = view.append("g");
 
-            if(errorBand){
-                pathView.append("path")
-                        .attr("d", CAreaFunction(dataset))
-                        .attr("fill", getColor('area', index))
-                        .style("opacity", 0.8);
+                    if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
+                        pathView.append("path")
+                                .attr("d", CAreaFunction(datasetH))
+                                .attr("fill", getColor('area', hazards[keyA].indexOf(keyH)))
+                                .style("opacity", 0.8);
+                    }
+
+                    pathView.append("path")
+                                       .attr("d", lineFunction(datasetH))
+                                       .attr("stroke", getColor('line', hazards[keyA].indexOf(keyH)))
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                    let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH};
+                    let circle = view.append("g")
+                        .selectAll("circle")
+                        .data(function(){
+                            return datasetH.map(function (e, i) {
+                                let newE = $.extend(true, {}, e);
+                                newE['data'] = circleData;
+                                return newE;
+                            });
+                        })
+                        .enter()
+                        .append("circle")
+                        .attr("cx", function(d, i) { return xScale(d.displacement); })
+                        .attr("cy", function(d, i) { return yScale(d.frequency); })
+                        .attr("r", 2)
+                        .style("fill", getColor('line', hazards[keyA].indexOf(keyH)))
+                        .on("mouseover", toolTipMouseover)
+                        .on("mousemove", toolTipMousemove)
+                        .on("mouseout", toolTipMouseout);
+
+                    /*
+                    legend = legendWrapper.append("g")
+                        .attr('class', 'legend')
+                        .attr('transform', function(d) {
+                            var h = 15;
+                            var x = width*.75;
+                            var y = 50 + index*h;
+                        return 'translate(' + x + ',' + y + ')';
+                    })
+
+                    legend.append('rect')
+                        .attr('width', '20px')
+                        .attr('height', '2px')
+                        .style('fill', getColor('area', index))
+                        .style('stroke', getColor('line', index))
+                        .on("mouseover", function(){
+                            //clipping problem
+                            view.moveToFront();
+                        });
+
+                    legend.append('text')
+                        .attr('x', 1.5*20)
+                        .attr('y', 5)
+                        .attr('font-size', '10px')
+                        .text(keyH.toProperCase())
+                        .on("mouseover", function(){
+                            //clipping problem
+                            view.moveToFront();
+                        });
+                    */
+
+                    views.push(pathView)
+                    views.push(circle)
+                };
             };
-
-            pathView.append("path")
-                               .attr("d", lineFunction(dataset))
-                               .attr("stroke", getColor('line', index))
-                               .attr("stroke-width", 2)
-                               .attr("fill", "none");
-
-            let circle = view.append("g")
-                .selectAll("circle")
-                .data(dataset)
-                .enter()
-                .append("circle")
-                .attr("cx", function(d, i) { return xScale(d.x); })
-                .attr("cy", function(d, i) { return yScale(d.y); })
-                .attr("r", 5)
-                .style("fill", getColor('line', index))
-                .on("mouseover", toolTipMouseover)
-                .on("mousemove", toolTipMousemove)
-                .on("mouseout", toolTipMouseout);
-
-            legend = legendWrapper.append("g")
-                .attr('class', 'legend')
-                .attr('transform', function(d) {
-                    var h = 15;
-                    var x = width*.75;
-                    var y = 50 + index*h;
-                return 'translate(' + x + ',' + y + ')';
-            })
-
-            legend.append('rect')
-                .attr('width', '20px')
-                .attr('height', '2px')
-                .style('fill', getColor('area', index))
-                .style('stroke', getColor('line', index))
-                .on("mouseover", function(){
-                    //clipping problem
-                    view.moveToFront();
-                });
-
-            legend.append('text')
-                .attr('x', 1.5*20)
-                .attr('y', 5)
-                .attr('font-size', '10px')
-                .text(labels[index])
-                .on("mouseover", function(){
-                    //clipping problem
-                    view.moveToFront();
-                });
-
-            views.push(pathView)
-            views.push(circle)
-        });
+        };
 
         d3.select(documentId)
             .style('position', 'relative')
@@ -341,7 +371,7 @@ var DrawBarChart = function(){
                 resetted();
             });
 
-        setTimeout(function() {resetted();}, 1000);
+        setTimeout(function() {resetted();}, 10);
 
         function zoomed() {
           views.forEach(function(view){
@@ -372,8 +402,6 @@ var DrawBarChart = function(){
         let parent = $(documentId);
         let width = parent.width() -10 ,
             height = parent.height() -10 ,
-            fontSize = ((parent.width()/(4*dataset.length))-barPadding)
-                       .toFixed(),
             padding = 25;
 
         // y - axis Value scale

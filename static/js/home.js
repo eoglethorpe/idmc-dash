@@ -2,6 +2,7 @@ let map;
 let countriesGeoData;
 let countriesMapLayer;
 let aadDataModel;
+let riskDataModel = {};
 
 function styleMapFeature(feature) {
     let selected = $('.countries-select').val().indexOf(feature.properties.ISO3) >= 0;
@@ -90,6 +91,9 @@ let filters = {
         }
         return typeList;
     },
+    getSelectedCountry: function() {
+        return $('#country-select-wrapper .countries-select').val();
+    }
 };
 
 $(document).ready(function(){
