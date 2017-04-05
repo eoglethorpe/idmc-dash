@@ -286,13 +286,13 @@ var DrawBarChart = function(){
                         .attr('clip-path', 'url(#path-clip)'),
                         index = 1;
 
-                    let pathView = view.append("g");
+                    let pathView = view.append("g").attr('class', 'pathView');
 
                     if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
                         pathView.append("path")
                                 .attr("d", CAreaFunction(datasetH))
                                 .attr("fill", getColor('area', keyC, keyA, keyH))
-                                .style("opacity", 0.7);
+                                .style("opacity", 0.4);
                     }
 
                     pathView.append("path")
@@ -302,8 +302,9 @@ var DrawBarChart = function(){
                                        .attr("fill", "none");
 
                     let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH};
-                    let circle = view.append("g")
-                        .selectAll("circle")
+                    let circle = view.append("g").attr('class', 'circleView');
+
+                    circle.selectAll("circle")
                         .data(function(){
                             return datasetH.map(function (e, i) {
                                 let newE = $.extend(true, {}, e);
@@ -315,7 +316,7 @@ var DrawBarChart = function(){
                         .append("circle")
                         .attr("cx", function(d, i) { return xScale(d.displacement); })
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
-                        .attr("r", 2)
+                        .attr("r", 5)
                         .style("fill", getColor('line',keyC, keyA, keyH))
                         .on("mouseover", toolTipMouseover)
                         .on("mousemove", toolTipMousemove)
@@ -352,8 +353,8 @@ var DrawBarChart = function(){
                         });
                     */
 
-                    views.push(pathView)
-                    views.push(circle)
+                    views.push(pathView);
+                    views.push(circle);
                 };
             };
         };
@@ -412,6 +413,13 @@ var DrawBarChart = function(){
 
         function zoomed() {
           views.forEach(function(view){
+              if (view.attr('class') === 'pathView'){
+                  view.selectAll('path')
+                      .style("stroke-width", 2/d3.event.transform.k);
+              }else if (view.attr('class') === 'circleView'){
+                  view.selectAll("circle")
+                      .attr("r", 5/d3.event.transform.k);
+              }
               view.attr("transform", d3.event.transform);
           });
           gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
