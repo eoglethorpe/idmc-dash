@@ -1,3 +1,45 @@
+function hashCode(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 8) - hash);
+    }
+    return hash;
+}
+function hslToRgb(h, s, l){
+    var r, g, b;
+
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }else{
+        var hue2rgb = function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+function intToRGB(i){
+    var c = (i & 0x00FFFFFF)
+    .toString(16)
+    .toUpperCase();
+
+    let index = parseInt("00000".substring(0, 6 - c.length) + c, 16)/0xffffff;
+    let rgb = hslToRgb(index, 0.6, 0.6);
+    // console.log(rgb);
+    // console.log(rgb[0].toString(16)+rgb[1].toString(16)+rgb[2].toString(16));
+    return rgb[0].toString(16)+rgb[1].toString(16)+rgb[2].toString(16);
+}
 var DrawBarChart = function(){
 
     this.init = function(){
@@ -26,14 +68,9 @@ var DrawBarChart = function(){
         hazardsColor = d3.schemeCategory20c;
 
 
-    var getColor = function(type, index){
-        if (type == 'area'){
-            index = index % colorsArea.length;
-            return colorsArea[index];
-        }else if(type == 'line'){
-            index = index % colorsLine.length;
-            return colorsLine[index];
-        }
+    var getColor = function(type, keyC, keyA, keyH){
+        let str = keyC + keyA + keyH;
+        return ('#'+intToRGB(hashCode(str)));
     };
 
     var getColorForHazard = function(hazards, hazard){
@@ -254,13 +291,13 @@ var DrawBarChart = function(){
                     if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
                         pathView.append("path")
                                 .attr("d", CAreaFunction(datasetH))
-                                .attr("fill", getColor('area', hazards[keyA].indexOf(keyH)))
-                                .style("opacity", 0.8);
+                                .attr("fill", getColor('area', keyC, keyA, keyH))
+                                .style("opacity", 0.7);
                     }
 
                     pathView.append("path")
                                        .attr("d", lineFunction(datasetH))
-                                       .attr("stroke", getColor('line', hazards[keyA].indexOf(keyH)))
+                                       .attr("stroke", getColor('line', keyC, keyA, keyH))
                                        .attr("stroke-width", 2)
                                        .attr("fill", "none");
 
@@ -279,7 +316,7 @@ var DrawBarChart = function(){
                         .attr("cx", function(d, i) { return xScale(d.displacement); })
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
                         .attr("r", 2)
-                        .style("fill", getColor('line', hazards[keyA].indexOf(keyH)))
+                        .style("fill", getColor('line',keyC, keyA, keyH))
                         .on("mouseover", toolTipMouseover)
                         .on("mousemove", toolTipMousemove)
                         .on("mouseout", toolTipMouseout);

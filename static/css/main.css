@@ -69,6 +69,24 @@ body {
             padding: 6px 16px; }
             body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn .fa, body main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn .fa {
               margin-right: 8px; }
+        body main #filter-wrapper #filters .select-wrapper {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          margin: 4px 0;
+          z-index: 2; }
+          body main #filter-wrapper #filters .select-wrapper label {
+            flex-basis: 108px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: rgba(0, 0, 0, 0.5);
+            margin-bottom: 6px;
+            flex-grow: 0;
+            flex-shrink: 0; }
+          body main #filter-wrapper #filters .select-wrapper > div {
+            flex-basis: calc(100% - 108px); }
         body main #filter-wrapper #filters .data-category {
           border-top: 1px solid rgba(0, 0, 0, 0.1);
           padding: 10px 24px;
@@ -121,31 +139,18 @@ body {
             background: inherit;
             left: 14px; }
           body main #filter-wrapper #filters .data-category#hybrid-data-category {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 12px; }
             body main #filter-wrapper #filters .data-category#hybrid-data-category label {
               margin-bottom: 0; }
-        body main #filter-wrapper #filters .select-wrapper {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          margin: 4px 0;
-          z-index: 2; }
-          body main #filter-wrapper #filters .select-wrapper label {
-            flex-basis: 108px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: rgba(0, 0, 0, 0.5);
-            margin-bottom: 6px;
-            flex-grow: 0;
-            flex-shrink: 0; }
-          body main #filter-wrapper #filters .select-wrapper > div {
-            flex-basis: calc(100% - 108px); }
+        body main #filter-wrapper #filters #region-selections {
+          text-transform: uppercase;
+          font-weight: 600;
+          color: rgba(0, 0, 0, 0.8); }
         body main #filter-wrapper #filters #country-select-wrapper {
-          margin-top: 16px; }
-        body main #filter-wrapper #filters #income-group-select-wrapper {
           margin-bottom: 16px; }
+        body main #filter-wrapper #filters #geo-region-select-wrapper {
+          margin-top: 12px; }
       body main #filter-wrapper #the-map {
         align-self: flex-end;
         flex-basis: 100%;

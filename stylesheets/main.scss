@@ -89,6 +89,28 @@ body{
                         }
                     }
                 }
+                .select-wrapper{
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin: 4px 0;
+                    z-index: 2;
+
+                    label{
+                        flex-basis: 108px;
+                        font-size: 0.8em;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        color: rgba(0, 0, 0, 0.5);
+                        margin-bottom: 6px;
+                        flex-grow: 0;
+                        flex-shrink: 0;
+                    }
+                    >div{
+                        flex-basis: calc(100% - 108px);
+                    }
+                }
                 .data-category{
                     border-top: 1px solid rgba(0, 0, 0, 0.1);
                     padding: 10px 24px;
@@ -153,39 +175,23 @@ body{
                     }
                     &#hybrid-data-category{
                         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                        margin-bottom: 12px;
 
                         label{
                             margin-bottom: 0;
                         }
                     }
                 }
-                .select-wrapper{
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin: 4px 0;
-                    z-index: 2;
-
-                    label{
-                        flex-basis: 108px;
-                        font-size: 0.8em;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                        color: rgba(0, 0, 0, 0.5);
-                        margin-bottom: 6px;
-                        flex-grow: 0;
-                        flex-shrink: 0;
-                    }
-                    >div{
-                        flex-basis: calc(100% - 108px);
-                    }
+                #region-selections{
+                    text-transform: uppercase;
+                    font-weight: 600;
+                    color: rgba(0, 0, 0, 0.8);
                 }
                 #country-select-wrapper{
-                    margin-top: 16px;
-                }
-                #income-group-select-wrapper{
                     margin-bottom: 16px;
+                }
+                #geo-region-select-wrapper{
+                    margin-top: 12px;
                 }
             }
             #the-map{
@@ -280,7 +286,6 @@ body{
         }
     }
 }
-
 .tooltip {
   z-index: 10;
   color: white;

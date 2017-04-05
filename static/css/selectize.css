@@ -38,6 +38,8 @@
     margin: 0; }
   .selectize-control.multi .selectize-input.has-items {
     padding: 2px 6px; }
+    .selectize-control.multi .selectize-input.has-items .item {
+      margin: 2px; }
   .selectize-control .selectize-dropdown {
     position: absolute;
     z-index: 11;

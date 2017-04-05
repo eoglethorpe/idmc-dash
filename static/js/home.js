@@ -21,6 +21,20 @@ function onEachMapFeature(feature, layer) {
         value: feature.properties.ISO3,
         text: feature.properties.English,
     });
+
+    layer.on('click', function() {
+        let selection = $('.countries-select').val();
+        let item = feature.properties.ISO3;
+
+        let index = selection.indexOf(item);
+        if (index < 0) {
+            selection.push(item);
+        } else {
+            selection.splice(index, 1);
+        }
+
+        $('.countries-select')[0].selectize.setValue(selection);
+    });
 }
 
 function refreshMap() {
@@ -46,6 +60,18 @@ let filters = {
             retrospective: [],
             hybrid: [],
         };
+    },
+
+    clear: function() {
+        $('#prospective-data-type .hazard-type')[0].selectize.setValue([]);
+        $('#retrospective-data-type .hazard-type')[0].selectize.setValue([]);
+        $('#country-select-wrapper .countries-select')[0].selectize.setValue([]);
+        $('#geo-region-select-wrapper .geo-region-select')[0].selectize.setValue([]);
+        $('#income-group-select-wrapper .income-group-select')[0].selectize.setValue([]);
+
+        $('#prospective-check').prop('checked', false);
+        $('#retrospective-check').prop('checked', false);
+        $('#hybrid-check').prop('checked', false);
     },
 
     addHazardType: function(analysisType, hazardType) {

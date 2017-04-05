@@ -224,12 +224,14 @@ $(document).ready(function(){
     loadAndDrawBarChart(countries, hazards, typeList);
     loadAndDrawRiskChart(countries, hazards, typeList);
 
+    $('#clear-filter-btn').click(function(){
+        filters.clear();
+    });
+
     $('#apply-filter-btn').click(function(){
         drawAadBar(aadDataModel, filters.getSelectedHazards(),
                    filters.getSelectedTypeList(), filters.getSelectedCountry());
         drawRiskChart(riskDataModel, filters.getSelectedHazards(),
                       filters.getSelectedTypeList(), filters.getSelectedCountry());
-         //console.log('Type:', filters.getSelectedTypeList());
-         //console.log('Hazards:', JSON.stringify(filters.getSelectedHazards()));
     });
 });
