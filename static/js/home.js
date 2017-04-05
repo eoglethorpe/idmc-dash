@@ -124,10 +124,10 @@ let filters = {
 
 $(document).ready(function(){
 
-    $('.hazard-type').selectize();
-    $('.countries-select').selectize();
-    $('.geo-region-select').selectize();
-    $('.income-group-select').selectize();
+    $('.hazard-type').selectize({plugins: ["remove_button"]});
+    $('.countries-select').selectize({plugins: ["remove_button"]});
+    $('.geo-region-select').selectize({plugins: ["remove_button"]});
+    $('.income-group-select').selectize({plugins: ["remove_button"]});
     filters.init();
 
     $('.countries-select').on('change', function() {

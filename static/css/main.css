@@ -16,6 +16,8 @@ body {
     margin: 0;
     text-transform: uppercase;
     color: #073861; }
+  body a {
+    text-decoration: none; }
   body header {
     flex-basis: 100%;
     display: flex;

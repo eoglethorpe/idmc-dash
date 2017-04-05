@@ -23,6 +23,9 @@ body{
         text-transform: uppercase;
         color: $primary-color;
     }
+    a{
+        text-decoration: none;
+    }
     header{
         flex-basis: 100%;
         display: flex;
