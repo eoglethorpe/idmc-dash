@@ -29,17 +29,24 @@ function hslToRgb(h, s, l){
 
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
-function intToRGB(i){
+function intToRGB(i, dark = false){
     var c = (i & 0x00FFFFFF)
     .toString(16)
     .toUpperCase();
 
     let index = parseInt("00000".substring(0, 6 - c.length) + c, 16)/0xffffff;
-    let rgb = hslToRgb(index, 0.6, 0.6);
+    var rgb;
+    if(dark){
+        rgb = hslToRgb(index, 0.6, 0.4);
+    }
+    else{
+        rgb = hslToRgb(index, 0.6, 0.6);
+    }
     // console.log(rgb);
     // console.log(rgb[0].toString(16)+rgb[1].toString(16)+rgb[2].toString(16));
     return rgb[0].toString(16)+rgb[1].toString(16)+rgb[2].toString(16);
 }
+
 var DrawBarChart = function(){
 
     this.init = function(){
@@ -70,6 +77,9 @@ var DrawBarChart = function(){
 
     var getColor = function(type, keyC, keyA, keyH){
         let str = keyC + keyA + keyH;
+        if(type == 'area'){
+            return ('#'+intToRGB(hashCode(str),true));
+        }
         return ('#'+intToRGB(hashCode(str)));
     };
 
