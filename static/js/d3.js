@@ -128,7 +128,7 @@ var DrawBarChart = function(){
                         .attr("class", "tooltip")
                         .style("opacity", 0);
 
-    var toolTipMouseover = function(d, i){
+    var toolTipMouseover = function(d, i, node){
         if(d.displacement && d.frequency){
             toolTip
                 .html('Displacement(X): <strong>'+d3.format(".3s")(d.displacement)+'</strong>'+
@@ -157,18 +157,18 @@ var DrawBarChart = function(){
                 .style("left", (d3.event.pageX + 10) + "px")
                 .style("top", (d3.event.pageY - 60) + "px")
                 .style("visibility", 'visible');
-        fadeBar(d3.select(this));
+        fadeBar(d3.select(node));
     },
     toolTipMousemove = function(d, i){
         toolTip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX+10)+"px");
     },
-    toolTipMouseout = function(d, i){
-        unFadeBar(d3.select(this));
+    toolTipMouseout = function(d, i, node){
         toolTip
             .transition()
             .duration(100)
             .style("opacity", 0)
             .style("visibility", 'hidden');
+        unFadeBar(d3.select(node));
     }
 
     this.drawPath = function(documentId, dataset, hazards, showType, countries, barPadding = 1) {
@@ -265,14 +265,24 @@ var DrawBarChart = function(){
 
         var CAreaFunction = d3.area()
                               .x(function(d){return xScale(d.displacement);})
-                              .y0(function(d){return yScale(d.frequency+d.displacement_stat_error*5);})
-                              .y1(function(d){return yScale(d.frequency-d.displacement_stat_error*5);});
+                              .y0(function(d){return yScale(d.frequency+d.displacement_stat_error);})
+                              .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);});
 
         //used by zoom
-        let views = [];
-        let pathWrapper = svg.append("g");
-        let legendWrapper = svg.append("g");
+        let views = [],
+            clipWrapper = svg.append("g")
+                        .attr('class', 'main')
+                        .attr('clip-path', 'url(#path-clip)'),
+            areaWrapper = clipWrapper.append("g").attr('class', 'areaWrapper'),
+            pathWrapper = clipWrapper.append("g").attr('class', 'pathWrapper'),
+            circleWrapper = clipWrapper.append("g").attr('class', 'circleWrapper'),
+            previewWrapper = clipWrapper.append("g").attr('class', 'previewWrapper'),
+            legendWrapper = clipWrapper.append("g").attr('class', 'legendWrapper');
 
+        views.push(areaWrapper);
+        views.push(pathWrapper);
+        views.push(circleWrapper);
+        views.push(previewWrapper);
         // for each data draw lines and area
         for(var keyC in dataset){
             if (countries.indexOf(keyC) == -1 ){continue;}
@@ -281,30 +291,25 @@ var DrawBarChart = function(){
                 for(var keyH in dataset[keyC][keyA]){
                     if (hazards[keyA].indexOf(keyH) == -1 ){continue;}
                     let datasetH = dataset[keyC][keyA][keyH];
-                    let view = pathWrapper.append("g")
-                        .attr('class', 'main')
-                        .attr('clip-path', 'url(#path-clip)'),
-                        index = 1;
 
-                    let pathView = view.append("g").attr('class', 'pathView');
-
+                    let areaView = null;
                     if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
-                        pathView.append("path")
+                        areaView = areaWrapper.append("path")
                                 .attr("d", CAreaFunction(datasetH))
                                 .attr("fill", getColor('area', keyC, keyA, keyH))
                                 .style("opacity", 0.4);
                     }
 
-                    pathView.append("path")
+                    let pathView = pathWrapper.append("path")
                                        .attr("d", lineFunction(datasetH))
                                        .attr("stroke", getColor('line', keyC, keyA, keyH))
                                        .attr("stroke-width", 2)
                                        .attr("fill", "none");
 
                     let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH};
-                    let circle = view.append("g").attr('class', 'circleView');
 
-                    circle.selectAll("circle")
+                    let circleView = circleWrapper.append("g");
+                    circleView.selectAll("circle")
                         .data(function(){
                             return datasetH.map(function (e, i) {
                                 let newE = $.extend(true, {}, e);
@@ -316,11 +321,28 @@ var DrawBarChart = function(){
                         .append("circle")
                         .attr("cx", function(d, i) { return xScale(d.displacement); })
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
-                        .attr("r", 5)
                         .style("fill", getColor('line',keyC, keyA, keyH))
-                        .on("mouseover", toolTipMouseover)
+                        .on("click", function(d, i){
+                                if(previewWrapper.select('g').node()){
+                                    circleWrapper.node().appendChild(previewWrapper.select('g').node());
+                                }
+                                previewWrapper.selectAll("*").remove();
+                                if (areaView != null){
+                                    previewWrapper.node().appendChild(areaView.node().cloneNode(true));
+                                    previewWrapper.select('path').style("opacity", .9);
+                                }
+                                previewWrapper.node().appendChild(pathView.node().cloneNode(true));
+                                previewWrapper.node().appendChild(circleView.node());
+                                previewWrapper.on("click", function(){
+                                    circleWrapper.node().appendChild(previewWrapper.select('g').node());
+                                    previewWrapper.selectAll("*").remove();
+                                });
+                        })
+                        .on("mouseover", function(d, i){toolTipMouseover(d, i, this);})
                         .on("mousemove", toolTipMousemove)
-                        .on("mouseout", toolTipMouseout);
+                        .on("mouseout", function(d, i){
+                            toolTipMouseout(d, i, this);
+                        });
 
                     /*
                     legend = legendWrapper.append("g")
@@ -352,9 +374,6 @@ var DrawBarChart = function(){
                             view.moveToFront();
                         });
                     */
-
-                    views.push(pathView);
-                    views.push(circle);
                 };
             };
         };
@@ -375,7 +394,7 @@ var DrawBarChart = function(){
         */
 
         let zoom = d3.zoom()
-            .scaleExtent([.8, 40])
+            .scaleExtent([.8, 1000])
             .translateExtent([[-100, -100], [width + 90, height + 100]])
             .on("zoom", zoomed);
 
@@ -413,14 +432,16 @@ var DrawBarChart = function(){
 
         function zoomed() {
           views.forEach(function(view){
-              if (view.attr('class') === 'pathView'){
-                  view.selectAll('path')
-                      .style("stroke-width", 2/d3.event.transform.k);
-              }else if (view.attr('class') === 'circleView'){
-                  view.selectAll("circle")
-                      .attr("r", 5/d3.event.transform.k);
-              }
               view.attr("transform", d3.event.transform);
+              view.selectAll('path')
+                  .style("stroke-width", 2/d3.event.transform.k);
+              view.selectAll("circle")
+                  .attr("r", function(){
+                      if(d3.event.transform.k < 6){
+                          return 0.1;
+                      }
+                        return 5/d3.event.transform.k;
+                  });
           });
           gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
           gY.call(yAxis.scale(d3.event.transform.rescaleY(yScale)));
@@ -605,9 +626,13 @@ var DrawBarChart = function(){
             .attr("fill", function(d) {
                 return getColorForHazard(labelScale.domain(), d.key);
             })
-            .on("mouseover", toolTipMouseover)
+            .on("mouseover", function(d, i){
+                toolTipMouseover(d, i, this);
+            })
             .on("mousemove",toolTipMousemove)
-            .on("mouseout", toolTipMouseout)
+            .on("mouseout", function(d, i){
+                toolTipMouseout(d, i, this);
+            })
             .attr("y", function(d) {
                 return yScale.range()[0];
             })
