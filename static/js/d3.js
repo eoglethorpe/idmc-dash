@@ -78,15 +78,11 @@ var DrawBarChart = function(){
     };
 
     var fadeBar = function(bar){
-        bar.attr('old-color', bar.style("fill"));
-        let newColor = d3.color(bar.attr('old-color'));
-        newColor.g = 150;
-        newColor.b = 150;
-        bar.style("fill", newColor);
+        bar.style('fill', d3.color(bar.style('fill')).brighter(.4));
     };
 
     var unFadeBar = function(bar){
-        bar.style("fill", bar.attr('old-color'));
+        bar.style('fill', d3.color(bar.style('fill')).brighter(-.4));
     };
 
     var readablizeNumber = function(number) {
@@ -261,15 +257,34 @@ var DrawBarChart = function(){
                              .x(function(d, i) {
                                  return xScale(d.displacement);
                              })
-                             .y(function(d, i) { return yScale(d.frequency); })
+                             .y(function(d, i) { return yScale(d.frequency); }),
+            CAreaFunction = d3.area()
+                .x(function(d){return xScale(d.displacement);})
+                .y0(function(d){return yScale(d.frequency+d.displacement_stat_error);})
+                .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);}),
 
-        var CAreaFunction = d3.area()
-                              .x(function(d){return xScale(d.displacement);})
-                              .y0(function(d){return yScale(d.frequency+d.displacement_stat_error);})
-                              .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);});
+            createPreview = function(pathView, circleView, areaView){
+                var reAppendChildren = function(){
+                    let previewCircle = previewWrapper.select('g').node(),
+                        previewLine = previewWrapper.select('path.risk-line').node();
+                    if (previewCircle) {circleWrapper.node().appendChild(previewCircle)};
+                    if (previewLine) {pathWrapper.node().appendChild(previewLine)};
+                    previewWrapper.selectAll("*").remove();
+                }
 
-        //used by zoom
-        let views = [],
+                reAppendChildren();
+                if (areaView != null){
+                    previewWrapper.node().appendChild(areaView.node().cloneNode(true));
+                    previewWrapper.select('path').style("opacity", .9);
+                }
+                previewWrapper.node().appendChild(pathView.node());
+                previewWrapper.node().appendChild(circleView.node());
+                previewWrapper.on("click", function(){
+                    reAppendChildren();
+                });
+            };
+
+        let views = [],//used by zoom
             clipWrapper = svg.append("g")
                         .attr('class', 'main')
                         .attr('clip-path', 'url(#path-clip)'),
@@ -296,15 +311,28 @@ var DrawBarChart = function(){
                     if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
                         areaView = areaWrapper.append("path")
                                 .attr("d", CAreaFunction(datasetH))
+                                .attr('class', 'risk-error-area')
                                 .attr("fill", getColor('area', keyC, keyA, keyH))
                                 .style("opacity", 0.4);
                     }
 
                     let pathView = pathWrapper.append("path")
-                                       .attr("d", lineFunction(datasetH))
-                                       .attr("stroke", getColor('line', keyC, keyA, keyH))
-                                       .attr("stroke-width", 2)
-                                       .attr("fill", "none");
+                        .attr("d", lineFunction(datasetH))
+                        .attr('class', 'risk-line')
+                        .attr("stroke", getColor('line', keyC, keyA, keyH))
+                        .attr("stroke-width", 2)
+                        .attr("fill", "none")
+                        .on("mouseover", function(){
+                            let line = d3.select(this);
+                            line.attr('stroke', d3.color(line.attr('stroke')).brighter(.4));
+                        })
+                        .on("mouseout", function(){
+                            let line = d3.select(this);
+                            line.attr("stroke", d3.color(line.attr('stroke')).brighter(-.4));
+                        })
+                        .on("click", function(d, i){
+                            createPreview(pathView, circleView, areaView);
+                        });
 
                     let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH};
 
@@ -323,20 +351,7 @@ var DrawBarChart = function(){
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
                         .style("fill", getColor('line',keyC, keyA, keyH))
                         .on("click", function(d, i){
-                                if(previewWrapper.select('g').node()){
-                                    circleWrapper.node().appendChild(previewWrapper.select('g').node());
-                                }
-                                previewWrapper.selectAll("*").remove();
-                                if (areaView != null){
-                                    previewWrapper.node().appendChild(areaView.node().cloneNode(true));
-                                    previewWrapper.select('path').style("opacity", .9);
-                                }
-                                previewWrapper.node().appendChild(pathView.node().cloneNode(true));
-                                previewWrapper.node().appendChild(circleView.node());
-                                previewWrapper.on("click", function(){
-                                    circleWrapper.node().appendChild(previewWrapper.select('g').node());
-                                    previewWrapper.selectAll("*").remove();
-                                });
+                            createPreview(pathView, circleView, areaView);
                         })
                         .on("mouseover", function(d, i){toolTipMouseover(d, i, this);})
                         .on("mousemove", toolTipMousemove)
