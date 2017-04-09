@@ -88,15 +88,13 @@ var DrawBarChart = function(){
     };
 
     var fadeBar = function(bar){
-        bar.attr('old-color', bar.style("fill"));
-        let newColor = d3.color(bar.attr('old-color'));
-        newColor.g = 150;
-        newColor.b = 150;
-        bar.style("fill", newColor);
+        //fade node with style fill
+        bar.style('fill', d3.color(bar.style('fill')).brighter(.4));
     };
 
     var unFadeBar = function(bar){
-        bar.style("fill", bar.attr('old-color'));
+        //unfade node with style fill
+        bar.style('fill', d3.color(bar.style('fill')).brighter(-.4));
     };
 
     var readablizeNumber = function(number) {
@@ -121,24 +119,22 @@ var DrawBarChart = function(){
             if(tenPower < 0){sign = '⁻'};
             return 10 + sign + formatPower(Math.round(Math.log(d) / Math.LN10));
         }
+        //only show 10^x tick
         //return d3.format(".1s")(d);
     };
 
     var tickFormat = function(d){
         return d3.format(".3s")(d);
-        //if (d == 0){ return 0}
-        //if (d <= 0){ return '-'+readablizeNumber(d*-1);}
-        //return readablizeNumber(d);
     };
 
-        //for showing info on mouse over
-    //
+    //for showing info
     var toolTip = d3.select("body")
                         .append("div")
                         .attr("class", "tooltip")
                         .style("opacity", 0);
 
     var toolTipMouseover = function(d, i, node){
+        // for risk upper chart
         if(d.displacement && d.frequency){
             toolTip
                 .html('Displacement(X): <strong>'+d3.format(".3s")(d.displacement)+'</strong>'+
@@ -151,7 +147,7 @@ var DrawBarChart = function(){
                       '<br>Error: <strong>'+d3.format(".3s")(d.displacement_stat_error)+'</strong>'
                 );
             }
-                //.style("background", d3.select(this).style("fill"))
+        //for bar chart
         }else if(d[0].data.x){
             toolTip
             .html('Country: '+d[0].data.x+
@@ -160,6 +156,7 @@ var DrawBarChart = function(){
                   '<br>AAD: <strong>'+d3.format(".3s")
                     (d.skip?d.d:d[0][1]-d[0][0])+'</strong>')
         };
+        //remainig tooltip for visibility and postion
             toolTip
                 .transition()
                 .duration(200)
@@ -170,9 +167,11 @@ var DrawBarChart = function(){
         fadeBar(d3.select(node));
     },
     toolTipMousemove = function(d, i){
+        //move tooltip as mouse pointer move
         toolTip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX+10)+"px");
     },
     toolTipMouseout = function(d, i, node){
+        // hide tooltip on mouseout
         toolTip
             .transition()
             .duration(100)
@@ -181,11 +180,11 @@ var DrawBarChart = function(){
         unFadeBar(d3.select(node));
     }
 
+    // draw upper chart(line chart)
     this.drawPath = function(documentId, dataset, hazards, showType, countries, barPadding = 1) {
 
         let yScale = d3.scaleLinear(),
-            xScale = d3.scaleLog(),
-            colorScale = d3.scaleLinear();
+            xScale = d3.scaleLog();
 
         let axisPadding = 1;
         let parent = $(documentId);
@@ -193,7 +192,7 @@ var DrawBarChart = function(){
             height = parent.height(),
             padding = 30;
 
-        // y - axis Value scale
+        // yScale.domain([0, max frequency])
         yScale.domain([0, d3.max(Object.keys(dataset), function(dataC) {
                 return d3.max(Object.keys(dataset[dataC]), function(dataA){
                     return d3.max(Object.keys(dataset[dataC][dataA]), function(dataH){
@@ -203,7 +202,7 @@ var DrawBarChart = function(){
                     })
                 })
         })]);
-        // x - axis scale
+        // yScale.domain([0, max displacement])
         xScale.domain([0.1, d3.max(Object.keys(dataset), function(dataC) {
                 return d3.max(Object.keys(dataset[dataC]), function(dataA){
                     return d3.max(Object.keys(dataset[dataC][dataA]), function(dataH){
@@ -214,11 +213,9 @@ var DrawBarChart = function(){
                 })
         })]);
 
+        //range according to parent window
         yScale.range([height-padding, axisPadding*padding]);
         xScale.range([axisPadding*padding, width]);
-        // color - Value scale
-        colorScale.domain([d3.min(dataset), d3.max(dataset)]);
-        colorScale.range([0, 255]);
 
         //Clear previous html
         parent.html('');
@@ -230,24 +227,31 @@ var DrawBarChart = function(){
                     .tickSize(-width+padding)
                     .tickFormat(tickFormat);
 
+        // main container for this chart
         let svg = d3.select(documentId)
             //create svg tag
             .append("svg")
             .attr("width", "100%")
             .attr("height", "100%")
             .attr("viewBox", "0 0 "+width+" "+height)
+            // for responsive
             .attr("preserveAspectRatio", "xMidYMid meet");
 
+        // group for x-axis
         let gX = svg.append("g")
             .attr("class", "axis")
             .attr("transform", "translate(0,"+ (height-padding)+")")
             .call(xAxis);
 
+        // group for y-axis
         let gY = svg.append("g")
             .attr("class", "axis")
             .attr("transform", "translate(" + padding + ",0)")
             .call(yAxis);
 
+        // change line to dot-dot lines
+        // needed to execute everytime if zoom event generate new line
+        // or TODO: add a css rule
         let axisLineDot = function(){
             gX.selectAll(".tick line")
                 .attr("stroke-dasharray", "2,2");
@@ -257,7 +261,7 @@ var DrawBarChart = function(){
 
         axisLineDot();
 
-        // Clipping
+        // Clipping window for inner line, area, circle and other node
         svg.append('defs')
             .append('clipPath')
             .attr('id', 'path-clip')
@@ -267,54 +271,98 @@ var DrawBarChart = function(){
             .attr('width', width - padding)
             .attr('height', height - 2*padding);
 
+        // function to generate lines
         var lineFunction = d3.line()
                              .x(function(d, i) {
                                  return xScale(d.displacement);
                              })
-                             .y(function(d, i) { return yScale(d.frequency); })
+                             .y(function(d, i) { return yScale(d.frequency); }),
+        // function to generate area
+            CAreaFunction = d3.area()
+                .x(function(d){return xScale(d.displacement);})
+                .y0(function(d){return yScale(d.frequency+d.displacement_stat_error);})
+                .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);}),
 
-        var CAreaFunction = d3.area()
-                              .x(function(d){return xScale(d.displacement);})
-                              .y0(function(d){return yScale(d.frequency+d.displacement_stat_error);})
-                              .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);});
+        // function to generate preview(Preview is front of all the other nodes)
+            createPreview = function(pathView, circleView, areaView){
+                // move node to previous wrapper
+                var reAppendChildren = function(){
+                    let previewCircle = previewWrapper.select('g').node(),
+                        previewLine = previewWrapper.select('path.risk-line').node();
+                    if (previewCircle) {circleWrapper.node().appendChild(previewCircle)};
+                    if (previewLine) {pathWrapper.node().appendChild(previewLine)};
+                    previewWrapper.selectAll("*").remove();
+                }
 
-        //used by zoom
-        let views = [],
+                reAppendChildren();
+                if (areaView != null){
+                    // here node is not moved but clone[ event listenser are not cloned]
+                    previewWrapper.node().appendChild(areaView.node().cloneNode(true));
+                    previewWrapper.select('path').style("opacity", .9);
+                }
+                // here nodes are moved, they should be moved back.
+                previewWrapper.node().appendChild(pathView.node());
+                previewWrapper.node().appendChild(circleView.node());
+
+                previewWrapper.on("click", function(){
+                    reAppendChildren();
+                });
+            };
+
+        let views = [],//used by zoom
+            // Wrapper with cliping rule
             clipWrapper = svg.append("g")
                         .attr('class', 'main')
                         .attr('clip-path', 'url(#path-clip)'),
-            areaWrapper = clipWrapper.append("g").attr('class', 'areaWrapper'),
-            pathWrapper = clipWrapper.append("g").attr('class', 'pathWrapper'),
-            circleWrapper = clipWrapper.append("g").attr('class', 'circleWrapper'),
-            previewWrapper = clipWrapper.append("g").attr('class', 'previewWrapper'),
-            legendWrapper = clipWrapper.append("g").attr('class', 'legendWrapper');
 
+            areaWrapper = clipWrapper.append("g").attr('class', 'areaWrapper'), // for error area
+            pathWrapper = clipWrapper.append("g").attr('class', 'pathWrapper'), //for lines
+            circleWrapper = clipWrapper.append("g").attr('class', 'circleWrapper'), // for circles(points)
+            previewWrapper = clipWrapper.append("g").attr('class', 'previewWrapper'), // for preview
+            legendWrapper = clipWrapper.append("g").attr('class', 'legendWrapper'); // for legends
+
+        // to pass zoom transition, see zoom callback
         views.push(areaWrapper);
         views.push(pathWrapper);
         views.push(circleWrapper);
         views.push(previewWrapper);
-        // for each data draw lines and area
+
+        // for each data draw lines, circles and areas
         for(var keyC in dataset){
-            if (countries.indexOf(keyC) == -1 ){continue;}
+            if (countries.indexOf(keyC) == -1 ){continue;} // filter with countries
             for(var keyA in dataset[keyC]){
-                if (showType.indexOf(keyA) == -1 ){continue;}
+                if (showType.indexOf(keyA) == -1 ){continue;} // filter with types
                 for(var keyH in dataset[keyC][keyA]){
-                    if (hazards[keyA].indexOf(keyH) == -1 ){continue;}
+                    if (hazards[keyA].indexOf(keyH) == -1 ){continue;} // filter with hazards
                     let datasetH = dataset[keyC][keyA][keyH];
 
                     let areaView = null;
                     if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
+                        // draw area if error is provided in the data
                         areaView = areaWrapper.append("path")
                                 .attr("d", CAreaFunction(datasetH))
+                                .attr('class', 'risk-error-area')
                                 .attr("fill", getColor('area', keyC, keyA, keyH))
                                 .style("opacity", 0.4);
                     }
 
                     let pathView = pathWrapper.append("path")
-                                       .attr("d", lineFunction(datasetH))
-                                       .attr("stroke", getColor('line', keyC, keyA, keyH))
-                                       .attr("stroke-width", 2)
-                                       .attr("fill", "none");
+                        .attr("d", lineFunction(datasetH))
+                        .attr('class', 'risk-line')
+                        .attr("stroke", getColor('line', keyC, keyA, keyH))
+                        .attr("stroke-width", 2)
+                        .attr("fill", "none")
+                        .on("mouseover", function(){
+                            let line = d3.select(this);
+                            line.attr('stroke', d3.color(line.attr('stroke')).brighter(.4));
+                        })
+                        .on("mouseout", function(){
+                            let line = d3.select(this);
+                            line.attr("stroke", d3.color(line.attr('stroke')).brighter(-.4));
+                        })
+                        .on("click", function(d, i){
+                            createPreview(pathView, circleView, areaView);
+                        });
 
                     let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH};
 
@@ -333,20 +381,7 @@ var DrawBarChart = function(){
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
                         .style("fill", getColor('line',keyC, keyA, keyH))
                         .on("click", function(d, i){
-                                if(previewWrapper.select('g').node()){
-                                    circleWrapper.node().appendChild(previewWrapper.select('g').node());
-                                }
-                                previewWrapper.selectAll("*").remove();
-                                if (areaView != null){
-                                    previewWrapper.node().appendChild(areaView.node().cloneNode(true));
-                                    previewWrapper.select('path').style("opacity", .9);
-                                }
-                                previewWrapper.node().appendChild(pathView.node().cloneNode(true));
-                                previewWrapper.node().appendChild(circleView.node());
-                                previewWrapper.on("click", function(){
-                                    circleWrapper.node().appendChild(previewWrapper.select('g').node());
-                                    previewWrapper.selectAll("*").remove();
-                                });
+                            createPreview(pathView, circleView, areaView);
                         })
                         .on("mouseover", function(d, i){toolTipMouseover(d, i, this);})
                         .on("mousemove", toolTipMousemove)
@@ -354,7 +389,7 @@ var DrawBarChart = function(){
                             toolTipMouseout(d, i, this);
                         });
 
-                    /*
+                    /*TODO: Best way to represent legends?
                     legend = legendWrapper.append("g")
                         .attr('class', 'legend')
                         .attr('transform', function(d) {
@@ -388,28 +423,22 @@ var DrawBarChart = function(){
             };
         };
 
+        // wrapper for buttons for zoom-in, out, reset
         d3.select(documentId)
             .style('position', 'relative')
             .append("div")
             .attr("class", "button-wrapper");
 
-        /*
-        let redrawButtonG = d3.select(documentId)
-            .selectAll("div.button-wrapper")
-            .append("button")
-            .text("Redraw")
-            .on("click", function(){
-                return draw(documentId, dataset, barPadding);
-            })
-        */
-
+        // define zoom with extend and callback
         let zoom = d3.zoom()
             .scaleExtent([.8, 1000])
             .translateExtent([[-100, -100], [width + 90, height + 100]])
             .on("zoom", zoomed);
 
+        // link zoom with main container
         svg.call(zoom);
 
+        //zoom-in button
         d3.select(documentId)
             .select(".button-wrapper")
             .append("button")
@@ -420,6 +449,7 @@ var DrawBarChart = function(){
                   .call(zoom.scaleBy, 1.3);
             });
 
+        //zoom-out button
         d3.select(documentId)
             .select(".button-wrapper")
             .append("button")
@@ -430,6 +460,7 @@ var DrawBarChart = function(){
                   .call(zoom.scaleBy, .7);
             });
 
+        //zoom-reset button
         d3.select(documentId)
             .select(".button-wrapper")
             .append("button")
@@ -438,11 +469,16 @@ var DrawBarChart = function(){
                 resetted();
             });
 
+        // zoom-out at the starting for better visibility
         setTimeout(function() {resetted();}, 10);
 
+        // function for zoom transition
         function zoomed() {
           views.forEach(function(view){
+              // transform elements(size, position)
               view.attr("transform", d3.event.transform);
+
+              //change size of path and circle as scale(dynamic)
               view.selectAll('path')
                   .style("stroke-width", 2/d3.event.transform.k);
               view.selectAll("circle")
@@ -453,16 +489,18 @@ var DrawBarChart = function(){
                         return 5/d3.event.transform.k;
                   });
           });
+          //change axis tick values and structure with axis callback
           gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
           gY.call(yAxis.scale(d3.event.transform.rescaleY(yScale)));
           axisLineDot();
         }
 
+        // reset position defined as scale of .9
         function resetted() {
           svg.transition()
               .duration(750)
               .call(zoom.transform, d3.zoomIdentity.scale(.9).translate(0, 20));
-              //.call(zoom.transform, d3.zoomIdentity);
+              //.call(zoom.transform, d3.zoomIdentity); // zoom to initial postion(x:0,y:0,s:1)
         }
 
     };
@@ -480,7 +518,6 @@ var DrawBarChart = function(){
             height = parent.height() -10 ,
             padding = 25;
 
-        // y - axis Value scale
         yScale.domain([0.1, d3.max(dataset, function(data) {
             let max = 0;
             for(let d in data){
@@ -497,9 +534,7 @@ var DrawBarChart = function(){
             }
             return max;
         })]);
-        // x - axis scale
         xScale.domain(dataset.map(function(d){return d.x;}));
-        // label - axis scale
         labelScale.domain(
             [].concat.apply([],
                 (Object.keys(hazards).map(function(d){
@@ -561,7 +596,6 @@ var DrawBarChart = function(){
                 .attr('clip-path', 'url(#bar-clip)');
 
         //Types to show i.e 'Prospective', 'Retrospective', 'Hybrid'
-        //TODO: use lowercase with searching
         if (showType == undefined){
             showType = ['prospective', 'retrospective', 'hybrid'];
         };
