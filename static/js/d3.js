@@ -698,7 +698,7 @@ var DrawBarChart = function(){
             .attr('x', function(d){return labelScale(d);})
             .attr('y', function(d){return -2;})
             .style("font-size", function(d){
-                return Math.min(labelScale.bandwidth()/11, 15);
+                return (Math.min(labelScale.bandwidth()/11, 15)+'px');
             })
             .text(function(d){return d.toProperCase();});
 
