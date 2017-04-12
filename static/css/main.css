@@ -41,10 +41,11 @@ body {
     body main .card {
       background-color: #fff;
       box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.3);
+      box-sizing: border-box;
       padding: 24px; }
     body main #filter-wrapper {
       height: calc(100% - 12px);
-      flex-basis: calc(40% - 12px);
+      flex-basis: calc(40% - 24px);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -163,7 +164,7 @@ body {
       flex-basis: calc(60% - 12px); }
       body main #viewports-wrapper #viewport-graph {
         height: calc(60% - 12px);
-        width: 100%;
+        width: 98%;
         margin-bottom: 12px;
         display: flex;
         align-items: center;
@@ -174,7 +175,7 @@ body {
           object-fit: contain; }
       body main #viewports-wrapper #viewport-chart {
         height: 40%;
-        flex-basis: calc(60% - 12px);
+        width: 98%;
         display: flex;
         align-items: center;
         justify-content: flex-start; }
@@ -210,7 +211,7 @@ body {
           flex-basis: 100%;
           height: 300px; }
       body main #viewports-wrapper {
-        flex-basis: 100%; }
+        flex-basis: 98%; }
         body main #viewports-wrapper #viewport-graph {
           height: auto; }
         body main #viewports-wrapper #viewport-chart {
