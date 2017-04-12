@@ -995,6 +995,14 @@ var DrawBarChart = function(){
 
         axisLineDot();
 
+
+        let axisTitle = svg.append("g")
+            .attr('class', 'axisTitle')
+
+        axisTitle.append('text')//x-axis
+            .text('average annual displacement')
+            .attr('transform',
+                'translate('+(width/2)+','+(height)+')')
         // Clipping
         svg.append('defs')
             .append('clipPath')
