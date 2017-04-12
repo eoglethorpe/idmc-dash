@@ -89,7 +89,14 @@ body {
             flex-grow: 0;
             flex-shrink: 0; }
           body main #filter-wrapper #filters .select-wrapper > div {
-            flex-basis: calc(100% - 108px); }
+            flex-basis: calc(100% - 144px); }
+          body main #filter-wrapper #filters .select-wrapper .fa {
+            flex-basis: 36px;
+            box-sizing: border-box;
+            padding-left: 18px;
+            font-size: 18px;
+            color: rgba(0, 0, 0, 0.5);
+            cursor: pointer; }
         body main #filter-wrapper #filters .data-category {
           border-top: 1px solid rgba(0, 0, 0, 0.1);
           padding: 10px 24px;

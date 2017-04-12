@@ -112,7 +112,15 @@ body{
                         flex-shrink: 0;
                     }
                     >div{
-                        flex-basis: calc(100% - 108px);
+                        flex-basis: calc(100% - 144px);
+                    }
+                    .fa{
+                        flex-basis: 36px;
+                        box-sizing: border-box;
+                        padding-left: 18px;
+                        font-size: 18px;
+                        color: rgba(0, 0, 0, 0.5);
+                        cursor: pointer;
                     }
                 }
                 .data-category{

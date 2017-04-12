@@ -20,6 +20,7 @@ function onEachMapFeature(feature, layer) {
     $('.countries-select')[0].selectize.addOption({
         value: feature.properties.ISO3,
         text: feature.properties.English,
+        shortName: feature.properties.Short_Name,
     });
 
     layer.on('click', function() {
@@ -132,6 +133,18 @@ $(document).ready(function(){
 
     $('.countries-select').on('change', function() {
         refreshMap();
+    });
+    $('.select-all-hazard').click(function(){
+        let selectField = $(this).siblings('.hazard-type')[0];
+
+        if($(this).hasClass('fa-check-square-o')){
+            $(this).removeClass('fa-check-square-o').addClass('fa-minus-square-o');
+            selectField.selectize.setValue(Object.keys(selectField.selectize.options));
+        }
+        else if($(this).hasClass('fa-minus-square-o')){
+            $(this).removeClass('fa-minus-square-o').addClass('fa-check-square-o');
+            selectField.selectize.setValue([]);
+        }
     });
 
     // Show the map
