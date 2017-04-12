@@ -61,6 +61,12 @@ var DrawBarChart = function(){
 
         return this;
     };
+
+    var iso3ToShortName = function(iso3){
+        if (iso3ToShortNameModel.hasOwnProperty(iso3)){
+            return iso3ToShortNameModel[iso3];
+        }return iso3;
+    };
     var colorsLine = [ "rgb(114, 147, 203)", "rgb(225, 151, 76)",
                        "rgb(132, 186, 91)", "rgb(211, 94, 96)",
                        "rgb(128, 133, 133)", "rgb(144, 103, 167)",
@@ -150,7 +156,7 @@ var DrawBarChart = function(){
             toolTip
                 .html('Displacement(X): <strong>'+d3.format(".3s")(d.displacement)+'</strong>'+
                       '<br>Frequency(Y): <strong>'+d3.format(".3s")(d.frequency)+'</strong>'+
-                      '<br>Country: <strong>'+d.data.country.toUpperCase()+'</strong>'+
+                      '<br>Country: <strong>'+iso3ToShortName(d.data.country)+'</strong>'+
                       '<br>Type: <strong>'+d.data.type.toProperCase()+'</strong>'+
                       '<br>Hazard: <strong>'+d.data.hazard.toProperCase()+'</strong>')
             if(d.hasOwnProperty('displacement_stat_error')){
@@ -161,7 +167,7 @@ var DrawBarChart = function(){
         //for bar chart
         }else if(d[0].data.x){
             toolTip
-            .html('Country: '+d[0].data.x+
+            .html('Country: '+iso3ToShortName(d[0].data.x)+
                   '<br>Type: <strong>'+d[0].data.type.toProperCase()+'</strong>'+
                   '<br>Hazard: <strong>'+d.key.toProperCase()+'</strong>'+
                   '<br>AAD: <strong>'+d3.format(".3s")
@@ -422,7 +428,7 @@ var DrawBarChart = function(){
                             line.attr('old-stroke', line.attr('stroke'));
                             line.attr('stroke', d3.color(line.attr('stroke')).brighter(.4));
                             toolTip.html(`
-                                Country: <strong>${data.country.toUpperCase()}</strong><br>
+                                Country: <strong>${iso3ToShortName(data.country)}</strong><br>
                                 Type: <strong>${data.type.toUpperCase()}</strong><br>
                                 Hazard: <strong>${data.hazard.toUpperCase()}</strong><br>
                                 `);
@@ -686,7 +692,8 @@ var DrawBarChart = function(){
         parent.html('');
 
         let xAxis = d3.axisBottom(xScale)
-                    .tickSize(-height+2*padding),
+                    .tickSize(-height+2*padding)
+                    .tickFormat(function(d){return iso3ToShortName(d);}),
             yAxis = d3.axisLeft(yScale)
                     .tickSize(-width+padding)
                     //.tickSize(1)
@@ -897,7 +904,9 @@ var DrawBarChart = function(){
         let parent = $(documentId);
         let width = parent.width() -10 ,
             height = parent.height() -10 ,
-            padding = 25;
+            paddingWL = 60,
+            paddingWR = 5,
+            paddingH = 25;
 
         let xScaleMin = 0,
             xScaleMax = d3.max(dataset, function(data) {
@@ -927,18 +936,19 @@ var DrawBarChart = function(){
                 })))
         );
 
-        yScale.range([height-padding, axisPadding*padding]);
-        xScale.range([axisPadding*padding, width], .9);
-        labelScale.range([-30, width-padding]);
+        yScale.range([height-paddingH, axisPadding*paddingH]);
+        xScale.range([axisPadding*paddingWL, width-paddingWR], .9);
+        labelScale.range([-30, width-paddingWR]);
 
         //Clear previous html
         parent.html('');
 
         let xAxis = d3.axisBottom(xScale)
-                    .tickSize(-height+2*padding),
+                    .tickSize(-height+2*paddingH),
                     //.tickFormat(tickFormat),
             yAxis = d3.axisLeft(yScale)
-                    .tickSize(-width+padding);
+                    .tickSize(-width+paddingWR)
+                    .tickFormat(function(d){return iso3ToShortName(d);});
 
         let svg = d3.select(documentId)
             //create svg tag
@@ -950,12 +960,12 @@ var DrawBarChart = function(){
 
         let gX = svg.append("g")
             .attr("class", "axis")
-            .attr("transform", "translate(0,"+ (height-padding)+")")
+            .attr("transform", "translate(0,"+ (height-paddingH)+")")
             .call(xAxis);
 
         let gY = svg.append("g")
             .attr("class", "axis")
-            .attr("transform", "translate(" + padding + ",0)")
+            .attr("transform", "translate(" + paddingWL + ",0)")
             .call(yAxis);
 
         let axisLineDot = function(){
@@ -970,10 +980,10 @@ var DrawBarChart = function(){
             .append('clipPath')
             .attr('id', 'bar-clip')
             .append('rect')
-            .attr('x', padding)
-            .attr('y', padding)
-            .attr('width', width - padding)
-            .attr('height', height - 2*padding);
+            .attr('x', paddingWL)
+            .attr('y', paddingH)
+            .attr('width', width - paddingWL - paddingWR)
+            .attr('height', height - 2*paddingH);
 
         let view = svg.append("g")
                 .attr('class', 'main')

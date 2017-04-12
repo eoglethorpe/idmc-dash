@@ -3,6 +3,7 @@ let countriesGeoData;
 let countriesMapLayer;
 let aadDataModel;
 let riskDataModel = {};
+var iso3ToShortNameModel = {};
 
 function styleMapFeature(feature) {
     let selected = $('.countries-select').val().indexOf(feature.properties.ISO3) >= 0;
@@ -20,8 +21,9 @@ function onEachMapFeature(feature, layer) {
     $('.countries-select')[0].selectize.addOption({
         value: feature.properties.ISO3,
         text: feature.properties.English,
-        shortName: feature.properties.Short_Name,
     });
+
+    iso3ToShortNameModel[feature.properties.ISO3] = feature.properties.Short_Name;
 
     layer.on('click', function() {
         let selection = $('.countries-select').val();
