@@ -158,15 +158,16 @@ $(document).ready(function(){
         ],
         hazards = {
             "prospective":[
-                "earthquake","flood"
-                ,"tsunami","storm","wind"
+                //"earthquake","flood"
+                //,"tsunami","storm","wind"
             ],
             "retrospective":[
-                //"hydrometeorological","landslides",
+                "hydrometeorological",
+                //"landslides",
                 //"tectonic","volcanic","total"
             ],
             "hybrid":[
-                "total"
+                //"total"
             ]
         },
         typeList = ['prospective', 'retrospective', 'hybrid'];

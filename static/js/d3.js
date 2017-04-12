@@ -417,6 +417,7 @@ var DrawBarChart = function(){
                             return 8;
                         })
                         .attr("stroke-dasharray", function(){
+                            if (hazardsList.length === 1) {return "";}
                             if (keyA === 'prospective'){return "2,2";}
                             if (keyA === 'retrospective'){return "5,8";}
                             return "";
@@ -526,6 +527,25 @@ var DrawBarChart = function(){
                     });
             });
         }else{
+            legendWrapper.append("g")
+                    .attr('class', 'legend')
+                    .attr('transform', function() {
+                        var h = 15;
+                        var x = width*.75;
+                        var y = 50 + -1*h;
+                    return 'translate(' + x + ',' + y + ')';
+                })
+                .append('text')
+                    .attr('x', -40)
+                    .attr('y', 5)
+                    .attr('font-size', '10px')
+                    .attr('font-anchor', 'center')
+                    .text(hazardsList[0].type.toUpperCase()+' - ' + hazardsList[0].hazard.toUpperCase())
+                    .on("mouseover", function(){
+                        //clipping problem
+                        //view.moveToFront();
+                    });
+
             countries.forEach(function(d, index){
                 let legend = legendWrapper.append("g")
                     .attr('class', 'legend')
@@ -550,7 +570,7 @@ var DrawBarChart = function(){
                     .attr('x', 1.5*20)
                     .attr('y', 5)
                     .attr('font-size', '10px')
-                    .text(d.toUpperCase())
+                    .text(iso3ToShortName(d))
                     .on("mouseover", function(){
                         //clipping problem
                         //view.moveToFront();
@@ -567,7 +587,7 @@ var DrawBarChart = function(){
         // define zoom with extend and callback
         let zoom = d3.zoom()
             .scaleExtent([.8, 1000])
-            .translateExtent([[-100, -100], [width + 90, height + 100]])
+            .translateExtent([[-500, -500], [width + 500, height + 500]])
             .on("zoom", zoomed);
 
         // link zoom with main container
