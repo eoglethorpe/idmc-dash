@@ -17,7 +17,6 @@ var csvJSON = function(csv){
 };
 
 var loadRiskModelaad = function(data){
-    let aadModel = {};
     filters.reset();
 
     data = csvJSON(data);
@@ -32,23 +31,32 @@ var loadRiskModelaad = function(data){
         // Add hazard types to filters
         filters.addHazardType(d.analysis_type, d.hazard);
 
-        if (aadModel.hasOwnProperty(d.iso3)){
-            if (aadModel[d.iso3].hasOwnProperty(d.analysis_type)){
-                aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+        if (aadDataModel.hasOwnProperty(d.iso3)){
+            if (aadDataModel[d.iso3].hasOwnProperty(d.analysis_type)){
+                aadDataModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
             }else{
-                aadModel[d.iso3][d.analysis_type] = {};
-                aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+                aadDataModel[d.iso3][d.analysis_type] = {};
+                aadDataModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
             }
         }else{
-            aadModel[d.iso3] = {};
-            aadModel[d.iso3][d.analysis_type] = {};
-            aadModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+            aadDataModel[d.iso3] = {};
+            aadDataModel[d.iso3][d.analysis_type] = {};
+            aadDataModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+        }
+
+        if (!aadCountries[d.analysis_type]) {
+            aadCountries[d.analysis_type] = {};
+        }
+        if (!aadCountries[d.analysis_type][d.hazard]) {
+            aadCountries[d.analysis_type][d.hazard] = [];
+        }
+        if (aadCountries[d.analysis_type][d.hazard].indexOf(d.iso3) < 0) {
+            aadCountries[d.analysis_type][d.hazard].push(d.iso3);
         }
     });
 
-    filters.reload();
-    return aadModel;
 
+    filters.reload();
 };
 
 var loadRiskModel = function(data, risk){
@@ -88,7 +96,18 @@ var loadRiskModel = function(data, risk){
             riskDataModel[d.iso3][d.analysis_type] = {};
             riskDataModel[d.iso3][d.analysis_type][d.hazard] = [get_hazard(d)];
         }
+
+        if (!riskCountries[d.analysis_type]) {
+            riskCountries[d.analysis_type] = {};
+        }
+        if (!riskCountries[d.analysis_type][d.hazard]) {
+            riskCountries[d.analysis_type][d.hazard] = [];
+        }
+        if (riskCountries[d.analysis_type][d.hazard].indexOf(d.iso3) < 0) {
+            riskCountries[d.analysis_type][d.hazard].push(d.iso3);
+        }
     });
+
 };
 
 var drawRiskChart = function(riskDataModel, hazards, typeList, countries){
@@ -96,16 +115,16 @@ var drawRiskChart = function(riskDataModel, hazards, typeList, countries){
     new DrawBarChart().init().drawPath("#viewport-graph", riskDataModel, hazards, typeList, countries);
 };
 
-var drawAadBar = function(aadModel, hazards, typeList, countries){
+var drawAadBar = function(aadDataModel, hazards, typeList, countries){
     let arrayDataBar = [];
-    if( aadModel == undefined ) {
+    if( aadDataModel == undefined ) {
         console.log('Error: Load Risk aad Data is not loaded yet');
         return false;
     };
-    for(let k in aadModel){
+    for(let k in aadDataModel){
         //countries.length > 0 &&
         if(countries.indexOf(k) == -1){continue;};
-        let newData = aadModel[k];
+        let newData = aadDataModel[k];
         newData.x = k;
         arrayDataBar.push(newData);
     }
@@ -119,7 +138,7 @@ var loadAndDrawBarChart = function(countries, hazards, typeList){
             url: "static/data/risk_model_aad.csv",
             dataType: "text",
             success: function(data) {
-                aadDataModel = loadRiskModelaad(data);
+                loadRiskModelaad(data);
                 drawAadBar(aadDataModel, hazards, typeList, countries);
             }
          });
@@ -179,7 +198,7 @@ $(document).ready(function(){
         filters.clear();
     });
 
-    $('#apply-filter-btn').click(function(){
+    $('.countries-select').change(function(){
         drawAadBar(aadDataModel, filters.getSelectedHazards(),
                    filters.getSelectedTypeList(), filters.getSelectedCountry());
         drawRiskChart(riskDataModel, filters.getSelectedHazards(),
