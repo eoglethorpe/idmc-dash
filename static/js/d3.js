@@ -717,7 +717,7 @@ var DrawBarChart = function(){
         let maxString = '';
         xScale.domain([xScaleMin, xScaleMax+xScaleMax/10]);
         yScale.domain(dataset.map(function(d){
-            maxString = iso3ToShortName(maxString.length)>iso3ToShortName(d.x.length)?maxString:d.x;
+            maxString = iso3ToShortName(maxString).length>iso3ToShortName(d.x).length?maxString:d.x;
             return d.x;
         }));
 
@@ -729,6 +729,7 @@ var DrawBarChart = function(){
             .append("text")
             .text(iso3ToShortName(maxString));
 
+        console.log(maxString, iso3ToShortName(maxString));
         paddingWL = vLayout?30:axisTextSvg.select('text').node().getBBox().width;
         axisTextSvg.remove();
 
