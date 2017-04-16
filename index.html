@@ -34,20 +34,24 @@
                     <h2>Filters</h2>
                     <div>
                         <button id='clear-filter-btn'><i class="fa fa-filter"></i>Clear</button>
-                        <button id='apply-filter-btn'><i class="fa fa-check"></i>Apply</button>
+                        <!-- <button id='apply-filter-btn'><i class="fa fa-check"></i>Apply</button> -->
                     </div>
+                </div>
+                <div class="step-separation">
+                    <h3>Step 1:</h3>
+                    <i class="fa fa-info-circle"></i>
                 </div>
                 <div id="prospective-data-type" class="data-category">
                     <label>
                         <span>Prospective</span>
                         <div class="material-toggle" title="Toggle prospective analysis selection">
-                    		<input id="prospective-check" type="checkbox"/>
+                    		<input class="filter" id="prospective-check" type="checkbox"/>
                     		<label for="prospective-check"></label>
                         </div>
                     </label>
                     <div class="select-wrapper">
                         <label>Hazard Type</label>
-                        <select class="hazard-type" placeholder="Hazard types" multiple>
+                        <select class="filter hazard-type" placeholder="Hazard types" multiple>
                         </select>
                         <i class="select-all-hazard fa fa-check-square-o" title="Select all hazards"></i>
                     </div>
@@ -57,13 +61,13 @@
                     <label>
                         <span>Retrospective</span>
                         <div class="material-toggle" title="Toggle retorspective analysis selection">
-                    		<input id="retrospective-check" type="checkbox"/>
+                    		<input class="filter" id="retrospective-check" type="checkbox"/>
                     		<label for="retrospective-check"></label>
                         </div>
                     </label>
                     <div class="select-wrapper">
                         <label>Hazard Type</label>
-                        <select class="hazard-type" placeholder="Hazard types" multiple>
+                        <select class="filter hazard-type" placeholder="Hazard types" multiple>
                         </select>
                         <i class="select-all-hazard fa fa-check-square-o" title="Select all hazards"></i>
                     </div>
@@ -72,10 +76,14 @@
                     <label>
                         <span>Hybrid</span>
                         <div class="material-toggle" title="Toggle hybrid analysis selection">
-                    		<input id="hybrid-check" type="checkbox"/>
+                    		<input class="filter" id="hybrid-check" type="checkbox"/>
                     		<label for="hybrid-check"></label>
                         </div>
                     </label>
+                </div>
+                <div class="step-separation">
+                    <h3>Step 2:</h3>
+                    <i class="fa fa-info-circle"></i>
                 </div>
                 <span id="region-selections">Region Selections</span>
                 <div class="select-wrapper" id="geo-region-select-wrapper">

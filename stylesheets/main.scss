@@ -73,7 +73,8 @@ body{
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 24px;
+                    margin-bottom: 12px;
+                    margin-top: -12px;
 
                     h2{
                         flex-basis: 40%;
@@ -91,6 +92,24 @@ body{
                         .fa{
                             margin-right: 8px;
                         }
+                    }
+                }
+                .step-separation{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin: 0 -24px;
+                    padding: 8px 24px;
+                    border-top: 1px solid rgba(7, 56, 97, 0.4);
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+                    h3{
+                        flex-basis: 80%;
+                    }
+                    .fa{
+                        cursor: pointer;
+                        font-size: 16px;
+                        color: rgba(0, 0, 0, 0.4);
                     }
                 }
                 .select-wrapper{
@@ -185,8 +204,11 @@ body{
                         background: inherit;
                         left: 14px;
                     }
+                    &#prospective-data-type{
+                        border-top: none;
+                    }
                     &#hybrid-data-category{
-                        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                        // border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                         margin-bottom: 12px;
 
                         label{
@@ -197,20 +219,26 @@ body{
                 #region-selections{
                     text-transform: uppercase;
                     font-weight: 600;
+                    display: block;
                     color: rgba(0, 0, 0, 0.8);
+                    margin: 8px -24px;
+                    padding: 0 24px;
                 }
                 #country-select-wrapper{
-                    margin-bottom: 16px;
                 }
-                #geo-region-select-wrapper{
-                    margin-top: 12px;
+                #income-group-select-wrapper{
                 }
             }
             #the-map{
                 align-self: flex-end;
                 flex-basis: 100%;
-                height: calc(40% - 12px);
+                height: calc(36% - 12px);
                 z-index: 1;
+                background-color: #fff;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+
+                &.leaflet-container{
+                }
             }
         }
         #viewports-wrapper{

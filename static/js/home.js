@@ -1,27 +1,34 @@
 let map;
 let countriesGeoData;
 let countriesMapLayer;
-let aadDataModel;
+let aadDataModel = {};
 let riskDataModel = {};
-var iso3ToShortNameModel = {};
+let aadCountries = {};
+let riskCountries = {};
+let iso3ToShortNameModel = {};
+let selectableCountries = [];
 
 function styleMapFeature(feature) {
     let selected = $('.countries-select').val().indexOf(feature.properties.ISO3) >= 0;
+    let selectable = (selectableCountries.indexOf(feature.properties.ISO3) >= 0);
+
     return {
-        fillColor: selected ? '#073861' : '#ecf0f1',
+        fillColor: (selected ? 'rgba(52,152,219,0.7)' : (selectable ? 'rgba(189,195,199,0.6)' : '#fff')),
         weight: 1.4,
         opacity: 1,
         color: '#37373b',
         dashArray: '3',
-        fillOpacity: 0.6
+        fillOpacity: 1,
     };
 }
 
 function onEachMapFeature(feature, layer) {
-    $('.countries-select')[0].selectize.addOption({
-        value: feature.properties.ISO3,
-        text: feature.properties.English,
-    });
+    if(selectableCountries.indexOf(feature.properties.ISO3) >= 0){
+        $('.countries-select')[0].selectize.addOption({
+            value: feature.properties.ISO3,
+            text: feature.properties.English,
+        });
+    }
 
     iso3ToShortNameModel[feature.properties.ISO3] = feature.properties.Short_Name;
 
@@ -41,6 +48,10 @@ function onEachMapFeature(feature, layer) {
 }
 
 function refreshMap() {
+    if (!map) {
+        return;
+    }
+
     if (countriesMapLayer) {
         countriesMapLayer.clearLayers();
     }
@@ -53,8 +64,13 @@ function refreshMap() {
 
 let filters = {
     init: function() {
+        let that = this;
         this.reset();
         this.reload();
+
+        $('.filter').change(function() {
+            that.refreshRegionSelections();
+        });
     },
 
     reset: function() {
@@ -98,6 +114,50 @@ let filters = {
         this.hazardTypes.retrospective.forEach(function(type) {
             retrospective.addOption({ value: type, text: type });
         });
+
+        this.refreshRegionSelections();
+    },
+
+    refreshRegionSelections: function() {
+        selectableCountries = [];
+
+        if($('#prospective-check').is(':checked')){
+            let prospectiveTypes = $('#prospective-data-type .hazard-type').val();
+            for (let i=0; i<prospectiveTypes.length; i++) {
+                let type = prospectiveTypes[i];
+                let countries = riskCountries['prospective'][type];
+
+                for (let j=0; j<countries.length; j++) {
+                    if (selectableCountries.indexOf(countries[j]) < 0) {
+                        selectableCountries.push(countries[j]);
+                    }
+                }
+            }
+        }
+        if($('#retrospective-check').is(':checked')){
+            let retrospectiveTypes = $('#retrospective-data-type .hazard-type').val();
+            for (let i=0; i<retrospectiveTypes.length; i++) {
+                let type = retrospectiveTypes[i];
+                let countries = riskCountries['retrospective'][type];
+
+                for (let j=0; j<countries.length; j++) {
+                    if (selectableCountries.indexOf(countries[j]) < 0) {
+                        selectableCountries.push(countries[j]);
+                    }
+                }
+            }
+        }
+        if($('#hybrid-check').is(':checked')){
+            let countries = riskCountries['hybrid']['total'];
+
+            for (let j=0; j<countries.length; j++) {
+                if (selectableCountries.indexOf(countries[j]) < 0) {
+                    selectableCountries.push(countries[j]);
+                }
+            }
+        }
+        $('.countries-select')[0].selectize.clearOptions();
+        refreshMap();
     },
 
     getSelectedHazards: function() {
@@ -107,6 +167,7 @@ let filters = {
             hybrid: ['total'],
         }
     },
+
     getSelectedTypeList: function() {
         let typeList = [];
         if($('#prospective-check').is(':checked')){
@@ -120,9 +181,10 @@ let filters = {
         }
         return typeList;
     },
+
     getSelectedCountry: function() {
         return $('#country-select-wrapper .countries-select').val();
-    }
+    },
 };
 
 $(document).ready(function(){
