@@ -128,7 +128,7 @@ var drawAadBar = function(aadDataModel, hazards, typeList, countries){
         newData.x = k;
         arrayDataBar.push(newData);
     }
-    new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards, typeList);
+    new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards, typeList, 'horizontal');
 };
 
 var loadAndDrawBarChart = function(countries, hazards, typeList){
@@ -171,13 +171,13 @@ $(document).ready(function(){
         //"ETH", "GAB", "GHA", "GIN",
         //"GMB", "GNB", "GNQ", "KEN",
         //"LBR", "LBY", "LSO", "MAR",
-        //"MDG", "MLI", "MOZ", "MRT",
+,       //"MDG", "MLI", "MOZ", "MRT",
             "MUS", "MWI",
-            "ARG",
+            "ARG"
         ],
         hazards = {
             "prospective":[
-                //"earthquake","flood"
+                "earthquake","flood"
                 //,"tsunami","storm","wind"
             ],
             "retrospective":[
@@ -186,7 +186,7 @@ $(document).ready(function(){
                 //"tectonic","volcanic","total"
             ],
             "hybrid":[
-                //"total"
+                "total"
             ]
         },
         typeList = ['prospective', 'retrospective', 'hybrid'];
