@@ -152,13 +152,13 @@ $(document).ready(function(){
         //"ETH", "GAB", "GHA", "GIN",
         //"GMB", "GNB", "GNQ", "KEN",
         //"LBR", "LBY", "LSO", "MAR",
-,       //"MDG", "MLI", "MOZ", "MRT",
+        //"MDG", "MLI", "MOZ", "MRT",
             "MUS", "MWI",
             "ARG"
         ],
         hazards = {
             "prospective":[
-                "earthquake","flood"
+                //"earthquake","flood"
                 //,"tsunami","storm","wind"
             ],
             "retrospective":[
