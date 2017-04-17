@@ -197,11 +197,11 @@ $(document).ready(function(){
     $('#clear-filter-btn').click(function(){
         filters.clear();
     });
-    $('.expand-graph').click(function(){
-        console.log('asd');
-        drawAadBar(aadDataModel, filters.getSelectedHazards(),
-                   filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
-    });
+    // $('.expand-graph').click(function(){
+    //     console.log('asd');
+    //     drawAadBar(aadDataModel, filters.getSelectedHazards(),
+    //                filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
+    // });
 
     $('.countries-select').change(function(){
         drawAadBar(aadDataModel, filters.getSelectedHazards(),

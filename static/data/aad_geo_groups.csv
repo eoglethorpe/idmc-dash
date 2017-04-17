@@ -1,0 +1,67 @@
+geographical_group,hazard,analysis_type,aad,aad_over_pop,population
+East Asia and Pacific,Earthquake,Prospective,362484.33,0.000157704394922259,2298504935
+East Asia and Pacific,Flood,Prospective,2491782.37,0.00109173408626546,2282407778
+East Asia and Pacific,Hydrometeorological,Retrospective,189931.44,0.000501161963687509,378982153
+East Asia and Pacific,Landslides,Retrospective,1657.0145,0.0000046514444496423,356236545
+East Asia and Pacific,Storm,Prospective,609027.42,0.000273545630506876,2226419844
+East Asia and Pacific,Tectonic,Retrospective,204103,0.000783260950237757,260581100
+East Asia and Pacific,Total,Hybrid,1434918,0.00378624161755712,378982153
+East Asia and Pacific,Total,Retrospective,395693.68,0.00104409581524542,378982153
+East Asia and Pacific,Tsunami,Prospective,31453.07,0.0000138711352196694,2267519529
+East Asia and Pacific,Volcanic,Retrospective,2.28125,0.0000000087544722161354,260581100
+East Asia and Pacific,Wind,Prospective,304423.71,0.000142032951336442,2143331580
+Europe and Central Asia,Earthquake,Prospective,218432.78,0.000243533783435968,896930097
+Europe and Central Asia,Flood,Prospective,707667.2,0.000799024852287985,885663566
+Europe and Central Asia,Hydrometeorological,Retrospective,789.8965,0.00000864801573689648,91338467
+Europe and Central Asia,Landslides,Retrospective,285.141,0.00000312180628124621,91338467
+Europe and Central Asia,Storm,Prospective,212.61,0.00000148222426808196,143439832
+Europe and Central Asia,Tectonic,Retrospective,2490.4959,0.0000272666706788499,91338467
+Europe and Central Asia,Total,Hybrid,113320,0.00124066019194301,91338467
+Europe and Central Asia,Total,Retrospective,3565.521,0.0000390363569382,91338467
+Europe and Central Asia,Tsunami,Prospective,371.13,0.000000748781252739988,495645422
+Europe and Central Asia,Wind,Prospective,0.45,0.00000932855158689028,48239
+Latin America and the Caribbean,Earthquake,Prospective,352923.15,0.000551778905272981,639609718
+Latin America and the Caribbean,Flood,Prospective,413424.04,0.000647999700100481,638000357
+Latin America and the Caribbean,Hydrometeorological,Retrospective,80237.83522,0.000199332762329595,402532099
+Latin America and the Caribbean,Landslides,Retrospective,4229.26138,0.0000108209920965892,390838598
+Latin America and the Caribbean,Storm,Prospective,61722.75,0.00020747702940512,297491969
+Latin America and the Caribbean,Tectonic,Retrospective,84631.600026,0.000222045749878989,381144877
+Latin America and the Caribbean,Total,Hybrid,518531,0.00129285493044248,401074388
+Latin America and the Caribbean,Total,Retrospective,170458.65953,0.000423466004210511,402532099
+Latin America and the Caribbean,Tsunami,Prospective,2692.03,0.00000433225660629705,621392093
+Latin America and the Caribbean,Volcanic,Retrospective,1359.9925476,0.00000485997458340865,279835321
+Latin America and the Caribbean,Wind,Prospective,98141.25,0.000341491470156962,287390048
+Middle East and North Africa,Earthquake,Prospective,231684.54,0.000536637699839484,431733626
+Middle East and North Africa,Flood,Prospective,152930.93,0.000355721837607318,429917182
+Middle East and North Africa,Hydrometeorological,Retrospective,5495.41137,0.0000288004643974871,190809818
+Middle East and North Africa,Landslides,Retrospective,4050.13528,0.0000171013522503834,236831288
+Middle East and North Africa,Storm,Prospective,144.21,0.00000170264530582956,84697617
+Middle East and North Africa,Tectonic,Retrospective,13024.77826,0.000151395810726977,86031299
+Middle East and North Africa,Total,Hybrid,139986,0.000620901452073581,225456068
+Middle East and North Africa,Total,Retrospective,22570.31737,0.0000794188675928116,284193392
+Middle East and North Africa,Tsunami,Prospective,2295.93,0.00000662443894722995,346584823
+North America,Earthquake,Prospective,45354.87,0.000125844117689046,360405165
+North America,Flood,Prospective,52815.7,0.000146545347095678,360405165
+North America,Storm,Prospective,48982,0.00015112360642026,324118787
+North America,Tsunami,Prospective,722.87,0.0000020053717730869,360466827
+North America,Wind,Prospective,72677.78,0.000201621271518558,360466827
+South Asia,Earthquake,Prospective,212887.92,0.000120498662854497,1766724335
+South Asia,Flood,Prospective,2730094.59,0.00154560964656357,1766354523
+South Asia,Hydrometeorological,Retrospective,832627.81701,0.000197116149626508,4224046678
+South Asia,Landslides,Retrospective,904.975523,0.000000312481708815752,2896091187
+South Asia,Storm,Prospective,36060.23,0.0000211701852955557,1703349758
+South Asia,Tectonic,Retrospective,85571.6849,0.0000295355352713959,2897245102
+South Asia,Total,Hybrid,627123,0.00257395329498881,243641950
+South Asia,Total,Retrospective,919104.597,0.000217588645927364,4224046678
+South Asia,Tsunami,Prospective,4635.35,0.00000272072357541799,1703719570
+South Asia,Wind,Prospective,263265.65,0.000156469275942619,1682538942
+Sub-Saharan Africa,Earthquake,Prospective,131613.76,0.000132618587698117,992423176
+Sub-Saharan Africa,Flood,Prospective,1109547.61,0.00109681364742593,1011609960
+Sub-Saharan Africa,Hydrometeorological,Retrospective,376309.799015,0.00119918428470434,313804812
+Sub-Saharan Africa,Landslides,Retrospective,1120.559501,0.00000479604788717446,233642267
+Sub-Saharan Africa,Storm,Prospective,11755.85,0.000175904741130187,66830774
+Sub-Saharan Africa,Tectonic,Retrospective,81.18442,0.000000621143009848322,130701656
+Sub-Saharan Africa,Total,Hybrid,676638,0.00215690534375197,313707786
+Sub-Saharan Africa,Total,Retrospective,377510.77995,0.00120301144378245,313804812
+Sub-Saharan Africa,Tsunami,Prospective,19.03,0.0000000354691939435936,536521919
+Sub-Saharan Africa,Wind,Prospective,94954.75,0.00132220233440376,71815597
