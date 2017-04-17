@@ -514,49 +514,16 @@ var DrawBarChart = function(){
             };
         };
 
-        let legendBackG = legendWrapper.append("g")
-            .append('rect');
-
-        let legendPadding = 15;
-
-        if (hazardsList.length > 1){
-            hazardsList.forEach(function(h,index){
-                let legend = legendWrapper.append("g")
-                    .attr('class', 'legend')
-                    .attr('transform', function() {
-                        var y = index*15;
-                        return 'translate(0,' + y + ')';
-                });
-
-                legend.append('path')
-                    .attr('d', 'M0,0L20,0')
-                    .attr('stroke-width', function(){
-                        if (h.type === 'prospective'){return 1;}
-                        if (h.type === 'retrospective'){return 1;}
-                        return 3;
-                    })
-                    .style('stroke', getColorForHazard(null, h.hazard))
-                    .attr("stroke-dasharray", function(){
-                            if (h.type === 'prospective'){return "2,2";}
-                            if (h.type === 'retrospective'){return "5,8";}
-                            return "";
-                        })
-                    .on("mouseover", function(){
-                        //view.moveToFront();
-                    });
-
-                legend.append('text')
-                    .attr('x', 1.5*20)
-                    .attr('y', 3)
-                    .attr('font-size', '10px')
-                    .text(h.type.toProperCase()+' - '+h.hazard.toProperCase())
-                    .on("mouseover", function(){
-                        //clipping problem
-                        //view.moveToFront();
-                    });
-            });
-        }else{
-            legendWrapper.append("g")
+        let drawLegends = function(legendWrapper, legendArray, legendIsH,
+                                   total, perPage, cPage){
+            legendWrapper.selectAll("*").remove();
+            let legendBackG = legendWrapper.append("g")
+                    .append('rect'),
+                sIndex = Math.floor((perPage)*(cPage-1)),
+                eIndex = -1;
+            if (!legendIsH){// for countries list
+                eIndex += 1 ;
+                legendWrapper.append("g")
                     .attr('class', 'legend')
                     .attr('transform', function() {
                         let y = 0;
@@ -572,47 +539,109 @@ var DrawBarChart = function(){
                         //clipping problem
                         //view.moveToFront();
                     });
+            };
 
-            countries.forEach(function(d, index){
+            legendArray.forEach(function(d,index){
+                if (!(index >= sIndex && index < sIndex+perPage)){return;};
+                eIndex += 1;
                 let legend = legendWrapper.append("g")
                     .attr('class', 'legend')
                     .attr('transform', function() {
-                        let y = (1+index)*15;
+                        var y = (eIndex)*15;
                         return 'translate(0,' + y + ')';
-                })
+                });
 
-                legend.append('rect')
-                    .attr('width', '20px')
-                    .attr('height', '5px')
-                    .style('fill', getColor('area', d, d, d))
-                    .on("mouseover", function(){
-                        //view.moveToFront();
-                    });
+                if (legendIsH){
+                    legend.append('path')
+                        .attr('d', 'M0,0L20,0')
+                        .attr('stroke-width', function(){
+                            if (d.type === 'prospective'){return 1;}
+                            if (d.type === 'retrospective'){return 1;}
+                            return 3;
+                        })
+                        .style('stroke', getColorForHazard(null, d.hazard))
+                        .attr("stroke-dasharray", function(){
+                                if (d.type === 'prospective'){return "2,2";}
+                                if (d.type === 'retrospective'){return "5,8";}
+                                return "";
+                            })
+                        .on("mouseover", function(){
+                            //view.moveToFront();
+                        });
+                }else{
+                    legend.append('rect')
+                        .attr('width', '20px')
+                        .attr('height', '5px')
+                        .style('fill', getColor('area', d, d, d))
+                        .on("mouseover", function(){
+                            //view.moveToFront();
+                        });
+                }
 
                 legend.append('text')
                     .attr('x', 1.5*20)
                     .attr('y', 5)
                     .attr('font-size', '10px')
-                    .text(iso3ToShortName(d))
+                    .text(legendIsH?d.type.toProperCase()+' - '+d.hazard.toProperCase()
+                         :iso3ToShortName(d))
                     .on("mouseover", function(){
-                        //view.moveToFront();
                     });
             });
+
+            if (total/perPage > 1){
+                eIndex += 1;
+                let pageNav = legendWrapper.append("g")
+                    .attr('class', 'legend-page-navigation')
+                    .attr('transform', function() {
+                        var y = (eIndex)*15;
+                        return 'translate(0,' + y + ')';
+                    })
+                if (cPage > 1){
+                    pageNav
+                        .append('text')
+                        .attr('x', 0)
+                        .attr('y', 5)
+                        .attr('font-size', '10px')
+                        .text('<')
+                        .on('click', function(){
+                            drawLegends(legendWrapper, legendArray, legendIsH,
+                                        legendArray.length, legendPerPage, cPage-1);
+                        });
+                }if (cPage < total/perPage){
+                    pageNav
+                        .append('text')
+                        .attr('x', 1.5*20)
+                        .attr('y', 5)
+                        .attr('font-size', '10px')
+                        .text('>')
+                        .on('click', function(){
+                            drawLegends(legendWrapper, legendArray, legendIsH,
+                                        legendArray.length, legendPerPage, cPage+1);
+                        });
+                }
+            }
+            legendBackG
+                .attr('fill', '#000')
+                .attr('opacity', 0.05)
+                .attr('x', -legendPadding)
+                .attr('y', -legendPadding)
+                .attr('width', legendWrapper.node().getBBox().width + 2*legendPadding)
+                .attr('height', legendWrapper.node().getBBox().height + 2*legendPadding);
+
+            legendWrapper.attr('transform', function(){
+                    var y = hPadding + 2*legendPadding;
+                    var x = width - legendBackG.node().getBBox().width - wPadding;
+                    return 'translate(' + x + ',' + y + ')';
+            });
         }
+        let legendPadding = 15,
+            legendPerPage = 10,
+            legendIsH = hazardsList.length>1?true:false,
+            legendArray = hazardsList.length>1?hazardsList:countries,
+            legendPages = legendArray.length/legendPerPage;
 
-        legendBackG
-            .attr('fill', '#000')
-            .attr('opacity', 0.05)
-            .attr('x', -legendPadding)
-            .attr('y', -legendPadding)
-            .attr('width', legendWrapper.node().getBBox().width + 2*legendPadding)
-            .attr('height', legendWrapper.node().getBBox().height + 2*legendPadding);
-
-        legendWrapper.attr('transform', function(){
-                var y = hPadding + 2*legendPadding;
-                var x = width - legendBackG.node().getBBox().width - wPadding;
-                return 'translate(' + x + ',' + y + ')';
-        });
+        drawLegends(legendWrapper, legendArray, legendIsH,
+                    legendArray.length, legendPerPage, 1);
         // wrapper for buttons for zoom-in, out, reset
         d3.select(documentId)
             .style('position', 'relative')
@@ -728,6 +757,7 @@ var DrawBarChart = function(){
         let dataset = datasetC.slice();
         let yScale = d3.scaleBand(),
             xScale = d3.scaleLinear(),
+            //legends
             labelScale = d3.scaleBand();
 
         let axisPadding = 1;
