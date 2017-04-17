@@ -624,6 +624,16 @@ var DrawBarChart = function(){
                 resetted();
             });
 
+        d3.select(documentId)
+            .select(".button-wrapper")
+            .append("button")
+            .html('<i class="fa fa-expand expand-graph"></i>')
+            .on("click", function(){
+                // $('footer').show();
+                // drawRiskChart(riskDataModel, filters.getSelectedHazards(),
+                            //   filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
+            });
+
         // zoom-out at the starting for better visibility
         setTimeout(function() {
             svg.transition()

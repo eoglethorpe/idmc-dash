@@ -3,7 +3,6 @@ $header-height: 80px;
 
 body{
     margin: 0;
-    width: 100vw;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -274,6 +273,20 @@ body{
             }
         }
     }
+    // footer{
+    //     height: calc(100vh - 24px);
+    //     flex-basis: 96%;
+    //     background-color: #fff;
+    //     box-shadow: 0 5px 15px -3px rgba(0 , 0, 0, 0.3);
+    //     box-sizing: border-box;
+    //     padding: 24px;
+    //     margin: 12px 0;
+    //
+    //     #expanded-viewport{
+    //         height: 100%;
+    //         width: 100%;
+    //     }
+    // }
     @media screen and (max-width: 1366px) {
         header{
             height: 64px;
