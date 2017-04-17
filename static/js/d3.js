@@ -215,9 +215,9 @@ var DrawBarChart = function(){
             hPadding = 25,
             wPadding = 65;
 
-        let yScaleMin = 0.1,
-            yScaleMax = 0,
-            xScaleMin = 10,
+        let yScaleMin,
+            yScaleMax,
+            xScaleMin,
             xScaleMax = d3.max(Object.keys(dataset), function(dataC) {
                 if (countries.indexOf(dataC) == -1 ){return 0;} // filter with countries
                 return d3.max(Object.keys(dataset[dataC]), function(dataA){
@@ -225,9 +225,15 @@ var DrawBarChart = function(){
                     return d3.max(Object.keys(dataset[dataC][dataA]), function(dataH){
                         if (hazards[dataA].indexOf(dataH) == -1 ){return 0;} // filter with hazards
                         return d3.max(dataset[dataC][dataA][dataH], function(data){
-                            yScaleMin = Math.min(yScaleMin, data.frequency);
-                            yScaleMax = Math.max(yScaleMax, data.frequency); // y-axis
-                            xScaleMin = Math.min(xScaleMin, data.displacement); // y-axis
+                            if (yScaleMin === undefined){
+                                yScaleMin = data.frequency;
+                                yScaleMax = data.frequency ;
+                                xScaleMin = data.displacement ;
+                            }else{
+                                yScaleMin = Math.min(yScaleMin, data.frequency);
+                                yScaleMax = Math.max(yScaleMax, data.frequency); // y-axis
+                                xScaleMin = Math.min(xScaleMin, data.displacement); // y-axis
+                            }
                             return data.displacement; // x-axis
                         })
                     })
@@ -859,7 +865,8 @@ var DrawBarChart = function(){
 
         //Types to show i.e 'Prospective', 'Retrospective', 'Hybrid'
         if (showType == undefined){
-            showType = ['prospective', 'retrospective', 'hybrid'];
+            //showType = ['prospective', 'retrospective', 'hybrid'];
+            showType = [];
         };
         // for each data draw bar
         let labelView = view.append("g"),
