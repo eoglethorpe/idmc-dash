@@ -104,13 +104,16 @@ body {
             flex-shrink: 0; }
           body main #filter-wrapper #filters .select-wrapper > div {
             flex-basis: calc(100% - 144px); }
-          body main #filter-wrapper #filters .select-wrapper .fa {
-            flex-basis: 36px;
+          body main #filter-wrapper #filters .select-wrapper img {
             box-sizing: border-box;
-            padding-left: 18px;
-            font-size: 18px;
-            color: rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+            height: 20px;
+            flex-basis: 20px;
+            padding-left: 10px;
             cursor: pointer; }
+            body main #filter-wrapper #filters .select-wrapper img.remove {
+              height: 18px;
+              flex-basis: 18px; }
         body main #filter-wrapper #filters .data-category {
           border-top: 1px solid rgba(0, 0, 0, 0.1);
           padding: 10px 24px;

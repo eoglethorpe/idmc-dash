@@ -122,6 +122,7 @@ let filters = {
 
     refreshRegionSelections: function() {
         selectableCountries = [];
+        let selectedCountries = $('.countries-select').val();
 
         if($('#prospective-check').is(':checked')){
             let prospectiveTypes = $('#prospective-data-type .hazard-type').val();
@@ -158,7 +159,9 @@ let filters = {
                 }
             }
         }
+
         $('.countries-select')[0].selectize.clearOptions();
+        $('.countries-select')[0].selectize.setValue(selectedCountries);
         refreshMap();
     },
 
@@ -203,16 +206,31 @@ $(document).ready(function(){
     $('.select-all-hazard').click(function(){
         let selectField = $(this).siblings('.hazard-type')[0];
 
-        if($(this).hasClass('fa-check-square-o')){
-            $(this).removeClass('fa-check-square-o').addClass('fa-minus-square-o');
+        if($(this).hasClass('double-check')){
+            $(this).removeClass('double-check').addClass('remove').attr('src', 'static/imgs/remove.png');
             selectField.selectize.setValue(Object.keys(selectField.selectize.options));
         }
-        else if($(this).hasClass('fa-minus-square-o')){
-            $(this).removeClass('fa-minus-square-o').addClass('fa-check-square-o');
+        else if($(this).hasClass('remove')){
+            $(this).removeClass('remove').addClass('double-check').attr('src', 'static/imgs/double_check.png');
             selectField.selectize.setValue([]);
         }
     });
 
+    $('.hazard-type').on('change', function(){
+        if(($(this).closest('#prospective-data-type').length > 0)){
+            $('#prospective-check').prop('checked', true);
+            if($(this).val().length < 1){
+                $('#prospective-check').prop('checked', false);
+            }
+        }
+        else if(($(this).closest('#retrospective-data-type').length > 0)){
+            $('#retrospective-check').prop('checked', true);
+            if($(this).val().length < 1){
+                $('#retrospective-check').prop('checked', false);
+            }
+        }
+        filters.refreshRegionSelections();
+    });
     // Show the map
     map = L.map('the-map').setView([41.87, 12.6], 1);
     map.scrollWheelZoom.disable();
