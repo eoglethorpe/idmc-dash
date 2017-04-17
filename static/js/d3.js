@@ -484,35 +484,34 @@ var DrawBarChart = function(){
             };
         };
 
+        let legendBackG = legendWrapper.append("g")
+            .append('rect');
+
+        let legendPadding = 15;
+
         if (hazardsList.length > 1){
             hazardsList.forEach(function(h,index){
                 let legend = legendWrapper.append("g")
                     .attr('class', 'legend')
                     .attr('transform', function() {
-                        var h = 15;
-                        var x = width*.65;
-                        var y = 50 + index*h;
-                    return 'translate(' + x + ',' + y + ')';
-                })
+                        var y = index*15;
+                        return 'translate(0,' + y + ')';
+                });
 
                 legend.append('path')
                     .attr('d', 'M0,0L20,0')
-                    //.attr('width', '20px')
                     .attr('stroke-width', function(){
                         if (h.type === 'prospective'){return 1;}
                         if (h.type === 'retrospective'){return 1;}
                         return 3;
                     })
                     .style('stroke', getColorForHazard(null, h.hazard))
-                    //.style('fill', getColor('area', index))
-                    //.style('stroke', getColor('line', index))
                     .attr("stroke-dasharray", function(){
                             if (h.type === 'prospective'){return "2,2";}
                             if (h.type === 'retrospective'){return "5,8";}
                             return "";
                         })
                     .on("mouseover", function(){
-                        //clipping problem
                         //view.moveToFront();
                     });
 
@@ -530,17 +529,15 @@ var DrawBarChart = function(){
             legendWrapper.append("g")
                     .attr('class', 'legend')
                     .attr('transform', function() {
-                        var h = 15;
-                        var x = width*.75;
-                        var y = 50 + -1*h;
-                    return 'translate(' + x + ',' + y + ')';
+                        let y = 0;
+                        return 'translate(0,' + y + ')';
                 })
                 .append('text')
-                    .attr('x', -40)
                     .attr('y', 5)
                     .attr('font-size', '10px')
                     .attr('font-anchor', 'center')
-                    .text(hazardsList[0].type.toUpperCase()+' - ' + hazardsList[0].hazard.toUpperCase())
+                    .text(hazardsList[0]?hazardsList[0].type.toUpperCase()+' - ' + hazardsList[0].hazard.toUpperCase()
+                    :'No Hazard Selected')
                     .on("mouseover", function(){
                         //clipping problem
                         //view.moveToFront();
@@ -550,19 +547,15 @@ var DrawBarChart = function(){
                 let legend = legendWrapper.append("g")
                     .attr('class', 'legend')
                     .attr('transform', function() {
-                        var h = 15;
-                        var x = width*.75;
-                        var y = 50 + index*h;
-                    return 'translate(' + x + ',' + y + ')';
+                        let y = (1+index)*15;
+                        return 'translate(0,' + y + ')';
                 })
 
                 legend.append('rect')
                     .attr('width', '20px')
                     .attr('height', '5px')
                     .style('fill', getColor('area', d, d, d))
-                    //.style('stroke', getColor('line', index))
                     .on("mouseover", function(){
-                        //clipping problem
                         //view.moveToFront();
                     });
 
@@ -572,12 +565,24 @@ var DrawBarChart = function(){
                     .attr('font-size', '10px')
                     .text(iso3ToShortName(d))
                     .on("mouseover", function(){
-                        //clipping problem
                         //view.moveToFront();
                     });
             });
         }
 
+        legendBackG
+            .attr('fill', '#000')
+            .attr('opacity', 0.05)
+            .attr('x', -legendPadding)
+            .attr('y', -legendPadding)
+            .attr('width', legendWrapper.node().getBBox().width + 2*legendPadding)
+            .attr('height', legendWrapper.node().getBBox().height + 2*legendPadding);
+
+        legendWrapper.attr('transform', function(){
+                var y = hPadding + 2*legendPadding;
+                var x = width - legendBackG.node().getBBox().width - wPadding;
+                return 'translate(' + x + ',' + y + ')';
+        });
         // wrapper for buttons for zoom-in, out, reset
         d3.select(documentId)
             .style('position', 'relative')
@@ -586,7 +591,7 @@ var DrawBarChart = function(){
 
         // define zoom with extend and callback
         let zoom = d3.zoom()
-            .scaleExtent([.8, 1000])
+            .scaleExtent([.4, 1000])
             .translateExtent([[-500, -500], [width + 500, height + 500]])
             .on("zoom", zoomed);
 
@@ -722,7 +727,7 @@ var DrawBarChart = function(){
         let maxString = '';
         xScale.domain([xScaleMin, xScaleMax+xScaleMax/10]);
         yScale.domain(dataset.map(function(d){
-            maxString = iso3ToShortName(maxString.length)>iso3ToShortName(d.x.length)?maxString:d.x;
+            maxString = iso3ToShortName(maxString).length>iso3ToShortName(d.x).length?maxString:d.x;
             return d.x;
         }));
 
@@ -734,13 +739,16 @@ var DrawBarChart = function(){
             .append("text")
             .text(iso3ToShortName(maxString));
 
+        console.log(maxString, iso3ToShortName(maxString));
         paddingWL = vLayout?30:axisTextSvg.select('text').node().getBBox().width;
         axisTextSvg.remove();
 
         labelScale.domain(
             [].concat.apply([],
                 (Object.keys(hazards).map(function(d){
-                    return hazards[d];
+                    if (showType.indexOf(d.toLowerCase()) != -1){
+                        return hazards[d];
+                    }return [];
                 })))
         );
 
@@ -829,7 +837,8 @@ var DrawBarChart = function(){
             showType = ['prospective', 'retrospective', 'hybrid'];
         };
         // for each data draw bar
-        let barView = view.append("g")
+        let labelView = view.append("g"),
+            barData = view.append("g")
             .selectAll("rect")
             .data(dataset)
             .enter()
@@ -928,8 +937,23 @@ var DrawBarChart = function(){
                     diff = vLayout?xScale(y0)-xScale(y1):xScale(y1)-xScale(y0)
                 //diff = diff<=0?-diff:diff;
                 return diff;
+            }).attr('', function(d){
+                /*
+                let rect = d3.select(this);
+                setTimeout(function(){
+                    labelView.append('text')
+                        .text(d3.format(',.7')(d[0][1]-d[0][0]))
+                        .attr('font-size', (yScale.bandwidth()/d[0].data.lenofType)*.50)
+                        .attr(vLayout?'x':'y', parseFloat(rect.attr(vLayout?'x':'y')) + (yScale.bandwidth()/d[0].data.lenofType)*.75)
+                        .attr(vLayout?'y':'x', parseFloat(rect.attr(vLayout?'y':'x'))+parseFloat(rect.attr(vLayout?'height':'width')))
+                        .attr('fill', function(d){
+                            return 'black';
+                        });
+                }, 2000);
+                */
             });
 
+        labelView.moveToFront();
         let legend = svg.append("g")
                 .attr('class', 'legend')
                 .attr('transform', function(d) {
