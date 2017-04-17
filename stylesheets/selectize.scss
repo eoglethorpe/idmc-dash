@@ -56,7 +56,11 @@ $primary-color: #073861;
 
         .item{
             margin: 2px;
+            text-transform: capitalize;
         }
+    }
+    .option{
+        text-transform: capitalize;
     }
     .selectize-dropdown{
         position: absolute;

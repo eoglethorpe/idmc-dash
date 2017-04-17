@@ -39,7 +39,10 @@
   .selectize-control.multi .selectize-input.has-items {
     padding: 2px 6px; }
     .selectize-control.multi .selectize-input.has-items .item {
-      margin: 2px; }
+      margin: 2px;
+      text-transform: capitalize; }
+  .selectize-control .option {
+    text-transform: capitalize; }
   .selectize-control .selectize-dropdown {
     position: absolute;
     z-index: 11;

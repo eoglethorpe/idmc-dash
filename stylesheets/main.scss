@@ -132,13 +132,18 @@ body{
                     >div{
                         flex-basis: calc(100% - 144px);
                     }
-                    .fa{
-                        flex-basis: 36px;
+                    img{
                         box-sizing: border-box;
-                        padding-left: 18px;
-                        font-size: 18px;
-                        color: rgba(0, 0, 0, 0.5);
+                        object-fit: contain;
+                        height: 20px;
+                        flex-basis: 20px;
+                        padding-left: 10px;
                         cursor: pointer;
+
+                        &.remove{
+                            height: 18px;
+                            flex-basis: 18px;
+                        }
                     }
                 }
                 .data-category{
