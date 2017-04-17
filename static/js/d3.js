@@ -1,3 +1,7 @@
+let tickValuesLog = Array.apply(null, Array(100)).map(function (_, i) {
+    return 10**(50-i);
+});
+
 function hashCode(str) {
     var hash = 0;
     for (var i = 0; i < str.length; i++) {
@@ -154,14 +158,14 @@ var DrawBarChart = function(){
         // for risk upper chart
         if(d.displacement && d.frequency){
             toolTip
-                .html('Displacement(X): <strong>'+d3.format(".3s")(d.displacement)+'</strong>'+
-                      '<br>Frequency(Y): <strong>'+d3.format(".3s")(d.frequency)+'</strong>'+
+                .html('Displacement(X): <strong>'+d3.format(",")(d.displacement)+'</strong>'+
+                      '<br>Frequency(Y): <strong>'+d3.format(",")(d.frequency)+'</strong>'+
                       '<br>Country: <strong>'+iso3ToShortName(d.data.country)+'</strong>'+
                       '<br>Type: <strong>'+d.data.type.toProperCase()+'</strong>'+
                       '<br>Hazard: <strong>'+d.data.hazard.toProperCase()+'</strong>')
             if(d.hasOwnProperty('displacement_stat_error')){
                 toolTip.html(toolTip.html()+
-                      '<br>Error: <strong>'+d3.format(".3s")(d.displacement_stat_error)+'</strong>'
+                      '<br>Error: <strong>'+d3.format(",")(d.displacement_stat_error)+'</strong>'
                 );
             }
         //for bar chart
@@ -170,7 +174,7 @@ var DrawBarChart = function(){
             .html('Country: '+iso3ToShortName(d[0].data.x)+
                   '<br>Type: <strong>'+d[0].data.type.toProperCase()+'</strong>'+
                   '<br>Hazard: <strong>'+d.key.toProperCase()+'</strong>'+
-                  '<br>AAD: <strong>'+d3.format(".3s")
+                  '<br>AAD: <strong>'+d3.format(",")
                     (d.skip?d.d:d[0][1]-d[0][0])+'</strong>')
         };
         //remainig tooltip for visibility and postion
@@ -241,16 +245,18 @@ var DrawBarChart = function(){
 
         //Clear previous html
         parent.html('');
-
         let xAxis = d3.axisBottom(xScale)
                     .tickSize(-height+2*hPadding)
-                    .tickFormat(tickFormatLog),
+                    .tickFormat(tickFormatLog)
+                    .tickValues(tickValuesLog),
             yAxis = d3.axisLeft(yScale)
                     .tickSize(-width+2*wPadding)
+                    .tickValues(tickValuesLog)
                     .tickFormat(tickFormatLog),
             yAxisS = d3.axisRight(yScaleS)
-                    .tickSize('1')
-                    .tickFormat(tickFormatLog);
+                    .tickSize('4')
+                    .tickFormat(tickFormatLog)
+                    .tickValues(tickValuesLog);
 
         // main container for this chart
         let svg = d3.select(documentId)
@@ -266,15 +272,18 @@ var DrawBarChart = function(){
         let gX = svg.append("g")
             .attr("class", "axis")
             .attr("transform", "translate(0,"+ (height-hPadding)+")")
+            .attr('clip-path', 'url(#path-x-axis-clip)')
             .call(xAxis);
 
         // group for y-axis
         let gY = svg.append("g")
             .attr("class", "axis")
+            .attr('clip-path', 'url(#path-y-axis-clip)')
             .attr("transform", "translate(" + wPadding + ",0)")
             .call(yAxis);
         let gYS = svg.append("g")
             .attr("class", "axis")
+            .attr('clip-path', 'url(#path-y-axis-clip)')
             .attr("transform", "translate(" +(width-wPadding) + ",0)")
             .call(yAxisS);
 
@@ -308,13 +317,28 @@ var DrawBarChart = function(){
                 'translate('+(width/2)+','+(height)+')')
 
         // Clipping window for inner line, area, circle and other node
-        svg.append('defs')
-            .append('clipPath')
+        let defsClip = svg.append('defs');
+
+        defsClip.append('clipPath')
             .attr('id', 'path-clip')
             .append('rect')
             .attr('x', wPadding)
             .attr('y', hPadding)
             .attr('width', width - 2*wPadding)
+            .attr('height', height - 2*hPadding);
+        defsClip.append('clipPath')
+            .attr('id', 'path-x-axis-clip')
+            .append('rect')
+            .attr('x', wPadding)
+            .attr('y', -height+hPadding)
+            .attr('width', width - 2*wPadding)
+            .attr('height', height);
+        defsClip.append('clipPath')
+            .attr('id', 'path-y-axis-clip')
+            .append('rect')
+            .attr('x', -wPadding)
+            .attr('y', hPadding)
+            .attr('width', width)
             .attr('height', height - 2*hPadding);
 
         // function to generate lines
@@ -430,8 +454,8 @@ var DrawBarChart = function(){
                             line.attr('stroke', d3.color(line.attr('stroke')).brighter(.4));
                             toolTip.html(`
                                 Country: <strong>${iso3ToShortName(data.country)}</strong><br>
-                                Type: <strong>${data.type.toUpperCase()}</strong><br>
-                                Hazard: <strong>${data.hazard.toUpperCase()}</strong><br>
+                                Type: <strong>${data.type.toProperCase()}</strong><br>
+                                Hazard: <strong>${data.hazard.toProperCase()}</strong><br>
                                 `);
                             toolTip
                                 .transition()
@@ -519,7 +543,7 @@ var DrawBarChart = function(){
                     .attr('x', 1.5*20)
                     .attr('y', 3)
                     .attr('font-size', '10px')
-                    .text(h.type.toUpperCase()+' - '+h.hazard.toUpperCase())
+                    .text(h.type.toProperCase()+' - '+h.hazard.toProperCase())
                     .on("mouseover", function(){
                         //clipping problem
                         //view.moveToFront();
@@ -536,7 +560,7 @@ var DrawBarChart = function(){
                     .attr('y', 5)
                     .attr('font-size', '10px')
                     .attr('font-anchor', 'center')
-                    .text(hazardsList[0]?hazardsList[0].type.toUpperCase()+' - ' + hazardsList[0].hazard.toUpperCase()
+                    .text(hazardsList[0]?hazardsList[0].type.toProperCase()+' - ' + hazardsList[0].hazard.toProperCase()
                     :'No Hazard Selected')
                     .on("mouseover", function(){
                         //clipping problem
@@ -630,11 +654,13 @@ var DrawBarChart = function(){
             });
 
         // zoom-out at the starting for better visibility
+        /*
         setTimeout(function() {
             svg.transition()
                 .duration(750)
                 .call(zoom.scaleBy, 0.7);
         }, 10);
+        */
 
         // function for zoom transition
         function zoomed() {
@@ -729,7 +755,6 @@ var DrawBarChart = function(){
             .append("text")
             .text(iso3ToShortName(maxString));
 
-        console.log(maxString, iso3ToShortName(maxString));
         paddingWL = vLayout?30:axisTextSvg.select('text').node().getBBox().width;
         axisTextSvg.remove();
 
