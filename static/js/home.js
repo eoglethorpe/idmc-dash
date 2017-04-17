@@ -91,8 +91,11 @@ let filters = {
         $('#prospective-check').prop('checked', false);
         $('#retrospective-check').prop('checked', false);
         $('#hybrid-check').prop('checked', false);
-        this.refreshRegionSelections();
+        $('.select-all-hazard').removeClass('remove').addClass('double-check').attr('src', 'static/imgs/double_check.png');
         refreshMap();
+        this.refreshRegionSelections();
+
+        $('.countries-select').trigger('change');
     },
 
     addHazardType: function(analysisType, hazardType) {
