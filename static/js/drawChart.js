@@ -110,12 +110,12 @@ var loadRiskModel = function(data, risk){
 
 };
 
-var drawRiskChart = function(riskDataModel, hazards, typeList, countries){
+var drawRiskChart = function(riskDataModel, hazards, typeList, countries, viewport){
     let labels = ["Tectonic", "Landslides", "Hydrometeorological", "TOTAL"];
-    new DrawBarChart().init().drawPath("#viewport-graph", riskDataModel, hazards, typeList, countries);
+    new DrawBarChart().init().drawPath(viewport, riskDataModel, hazards, typeList, countries);
 };
 
-var drawAadBar = function(aadDataModel, hazards, typeList, countries){
+var drawAadBar = function(aadDataModel, hazards, typeList, countries, viewport){
     let arrayDataBar = [];
     if( aadDataModel == undefined ) {
         console.log('Error: Load Risk aad Data is not loaded yet');
@@ -128,10 +128,10 @@ var drawAadBar = function(aadDataModel, hazards, typeList, countries){
         newData.x = k;
         arrayDataBar.push(newData);
     }
-    new DrawBarChart().init().drawBar("#viewport-chart", arrayDataBar, hazards, typeList, 'horizontal');
+    new DrawBarChart().init().drawBar(viewport, arrayDataBar, hazards, typeList, 'horizontal');
 };
 
-var loadAndDrawBarChart = function(countries, hazards, typeList){
+var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
     $(document).ready(function() {
         $.ajax({
             type: "GET",
@@ -139,13 +139,13 @@ var loadAndDrawBarChart = function(countries, hazards, typeList){
             dataType: "text",
             success: function(data) {
                 loadRiskModelaad(data);
-                drawAadBar(aadDataModel, hazards, typeList, countries);
+                drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
             }
          });
     });
 };
 
-var loadAndDrawRiskChart = function(countries, hazards, typeList){
+var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport){
     $.when(
         $.get('static/data/risk_model_hybrid.csv', function(data){
                 loadRiskModel(data, 'hybrid');
@@ -157,7 +157,7 @@ var loadAndDrawRiskChart = function(countries, hazards, typeList){
                 loadRiskModel(data, 'retrospective');
         })
     ).then(function() {
-        drawRiskChart(riskDataModel, hazards, typeList, countries);
+        drawRiskChart(riskDataModel, hazards, typeList, countries, viewport);
     });
 };
 
@@ -191,17 +191,22 @@ $(document).ready(function(){
         },
         typeList = ['prospective', 'retrospective', 'hybrid'];
 
-    loadAndDrawBarChart(countries, hazards, typeList);
-    loadAndDrawRiskChart(countries, hazards, typeList);
+    loadAndDrawBarChart(countries, hazards, typeList, "#viewport-chart");
+    loadAndDrawRiskChart(countries, hazards, typeList, '#viewport-graph');
 
     $('#clear-filter-btn').click(function(){
         filters.clear();
     });
+    $('.expand-graph').click(function(){
+        console.log('asd');
+        drawAadBar(aadDataModel, filters.getSelectedHazards(),
+                   filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
+    });
 
     $('.countries-select').change(function(){
         drawAadBar(aadDataModel, filters.getSelectedHazards(),
-                   filters.getSelectedTypeList(), filters.getSelectedCountry());
+                   filters.getSelectedTypeList(), filters.getSelectedCountry(), "#viewport-chart");
         drawRiskChart(riskDataModel, filters.getSelectedHazards(),
-                      filters.getSelectedTypeList(), filters.getSelectedCountry());
+                      filters.getSelectedTypeList(), filters.getSelectedCountry(), "#viewport-graph");
     });
 });

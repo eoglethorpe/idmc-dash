@@ -91,6 +91,8 @@ let filters = {
         $('#prospective-check').prop('checked', false);
         $('#retrospective-check').prop('checked', false);
         $('#hybrid-check').prop('checked', false);
+        this.refreshRegionSelections();
+        refreshMap();
     },
 
     addHazardType: function(analysisType, hazardType) {
