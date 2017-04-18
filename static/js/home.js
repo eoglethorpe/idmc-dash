@@ -5,8 +5,12 @@ let aadDataModel = {};
 let riskDataModel = {};
 let aadCountries = {};
 let riskCountries = {};
+let aadGeoGroups = {};
+let aadIncomeGroups = {};
 let iso3ToShortNameModel = {};
 let selectableCountries = [];
+let selectableIncomeGroups = [];
+let selectableGeoGroups = [];
 
 function styleMapFeature(feature) {
     let selected = $('.countries-select').val().indexOf(feature.properties.ISO3) >= 0;
@@ -44,6 +48,10 @@ function onEachMapFeature(feature, layer) {
         }
 
         $('.countries-select')[0].selectize.setValue(selection);
+    });
+
+    layer.bindTooltip(feature.properties.English, {
+        sticky: true,
     });
 }
 
@@ -125,14 +133,30 @@ let filters = {
 
     refreshRegionSelections: function() {
         selectableCountries = [];
+        selectableIncomeGroups = [];
+        selectableGeoGroups = [];
         let selectedCountries = $('.countries-select').val();
+        let selectedIncomeGroups = $('.income-group-select').val();
+        let selectedGeoGroups = $('.geo-region-select').val();
 
         if($('#prospective-check').is(':checked')){
             let prospectiveTypes = $('#prospective-data-type .hazard-type').val();
             for (let i=0; i<prospectiveTypes.length; i++) {
                 let type = prospectiveTypes[i];
                 let countries = riskCountries['prospective'][type];
+                let incomeGroups = aadIncomeGroups['prospective'][type];
+                let geoGroups = aadGeoGroups['prospective'][type];
 
+                for (let j=0; j<geoGroups.length; j++){
+                    if (selectableGeoGroups.indexOf(geoGroups[j]) < 0) {
+                        selectableGeoGroups.push(geoGroups[j]);
+                    }
+                }
+                for (let j=0; j<incomeGroups.length; j++){
+                    if (selectableIncomeGroups.indexOf(incomeGroups[j]) < 0) {
+                        selectableIncomeGroups.push(incomeGroups[j]);
+                    }
+                }
                 for (let j=0; j<countries.length; j++) {
                     if (selectableCountries.indexOf(countries[j]) < 0) {
                         selectableCountries.push(countries[j]);
@@ -145,7 +169,19 @@ let filters = {
             for (let i=0; i<retrospectiveTypes.length; i++) {
                 let type = retrospectiveTypes[i];
                 let countries = riskCountries['retrospective'][type];
+                let incomeGroups = aadIncomeGroups['retrospective'][type];
+                let geoGroups = aadGeoGroups['retrospective'][type];
 
+                for (let j=0; j<geoGroups.length; j++){
+                    if (selectableGeoGroups.indexOf(geoGroups[j]) < 0) {
+                        selectableGeoGroups.push(geoGroups[j]);
+                    }
+                }
+                for (let j=0; j<incomeGroups.length; j++){
+                    if (selectableIncomeGroups.indexOf(incomeGroups[j]) < 0) {
+                        selectableIncomeGroups.push(incomeGroups[j]);
+                    }
+                }
                 for (let j=0; j<countries.length; j++) {
                     if (selectableCountries.indexOf(countries[j]) < 0) {
                         selectableCountries.push(countries[j]);
@@ -155,7 +191,19 @@ let filters = {
         }
         if($('#hybrid-check').is(':checked')){
             let countries = riskCountries['hybrid']['total'];
+            let incomeGroups = aadIncomeGroups['hybrid']['total'];
+            let geoGroups = aadGeoGroups['hybrid']['total'];
 
+            for (let j=0; j<geoGroups.length; j++){
+                if (selectableGeoGroups.indexOf(geoGroups[j]) < 0) {
+                    selectableGeoGroups.push(geoGroups[j]);
+                }
+            }
+            for (let j=0; j<incomeGroups.length; j++){
+                if (selectableIncomeGroups.indexOf(incomeGroups[j]) < 0) {
+                    selectableIncomeGroups.push(incomeGroups[j]);
+                }
+            }
             for (let j=0; j<countries.length; j++) {
                 if (selectableCountries.indexOf(countries[j]) < 0) {
                     selectableCountries.push(countries[j]);
@@ -165,6 +213,25 @@ let filters = {
 
         $('.countries-select')[0].selectize.clearOptions();
         $('.countries-select')[0].selectize.setValue(selectedCountries);
+
+        $('.geo-region-select')[0].selectize.clearOptions();
+        for (let i=0; i<selectableGeoGroups.length; i++) {
+            $('.geo-region-select')[0].selectize.addOption({
+                value: selectableGeoGroups[i],
+                text: selectableGeoGroups[i],
+            });
+        }
+        $('.geo-region-select')[0].selectize.setValue(selectedGeoGroups);
+
+        $('.income-group-select')[0].selectize.clearOptions();
+        for (let i=0; i<selectableIncomeGroups.length; i++) {
+            $('.income-group-select')[0].selectize.addOption({
+                value: selectableIncomeGroups[i],
+                text: selectableIncomeGroups[i],
+            });
+        }
+        $('.income-group-select')[0].selectize.setValue(selectedIncomeGroups);
+
         refreshMap();
     },
 
@@ -190,8 +257,11 @@ let filters = {
         return typeList;
     },
 
-    getSelectedCountry: function() {
-        return $('#country-select-wrapper .countries-select').val();
+    getSelectedRegions: function() {
+        let selectedRegions = $('#country-select-wrapper .countries-select').val();
+        return selectedRegions.concat(
+            $('#income-group-select-wrapper .income-group-select').val(),
+            $('#geo-region-select-wrapper .geo-region-select').val());
     },
 };
 
@@ -237,6 +307,16 @@ $(document).ready(function(){
     // Show the map
     map = L.map('the-map').setView([41.87, 12.6], 1);
     map.scrollWheelZoom.disable();
+
+    var legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+        div.innerHTML = ("<div id='selected-label'><span></span>Selected</div>");
+        div.innerHTML += ("<div id='Selectable-label'><span></span>Selectable</div>");
+        div.innerHTML += ("<div id='not-selectable-label'><span></span>Not selectable</div>");
+        return div;
+    };
+    legend.addTo(map);
 
     // Toggle scroll-zoom by clicking on and outside map
     map.on('focus', function() { map.scrollWheelZoom.enable(); });

@@ -141,8 +141,8 @@ body{
                         cursor: pointer;
 
                         &.remove{
-                            height: 18px;
-                            flex-basis: 18px;
+                            height: 16px;
+                            flex-basis: 16px;
                         }
                     }
                 }
@@ -236,12 +236,41 @@ body{
             #the-map{
                 align-self: flex-end;
                 flex-basis: 100%;
+
                 height: calc(36% - 12px);
                 z-index: 1;
                 background-color: #fff;
                 border: 1px solid rgba(0, 0, 0, 0.1);
 
                 &.leaflet-container{
+                }
+                .legend{
+                    background-color: rgba(255, 255, 255, 0.9);
+                    margin: 0;
+                    padding: 8px;
+                    border-radius: 3px;
+
+                    >div{
+                        span{
+                            width: 16px;
+                            height: 12px;
+                            display: inline-block;
+                            margin-right: 4px;
+                            border: 1px solid rgba(0, 0, 0, 0.2);
+                            background-color: #d7dbdd;
+                            vertical-align: baseline;
+                        }
+                    }
+                    #selected-label{
+                        span{
+                            background-color: #70b6e5;
+                        }
+                    }
+                    #not-selectable-label{
+                        span{
+                            background-color: #fff;
+                        }
+                    }
                 }
             }
         }
@@ -369,7 +398,9 @@ body{
     font-family: sans-serif;
     font-size: 8px;
 }
-
+.legend-page-navigation{
+    cursor: pointer;
+}
 .axisTitle text {
     font-family: sans-serif;
     font-size: 10px;

@@ -112,8 +112,8 @@ body {
             padding-left: 10px;
             cursor: pointer; }
             body main #filter-wrapper #filters .select-wrapper img.remove {
-              height: 18px;
-              flex-basis: 18px; }
+              height: 16px;
+              flex-basis: 16px; }
         body main #filter-wrapper #filters .data-category {
           border-top: 1px solid rgba(0, 0, 0, 0.1);
           padding: 10px 24px;
@@ -185,6 +185,23 @@ body {
         z-index: 1;
         background-color: #fff;
         border: 1px solid rgba(0, 0, 0, 0.1); }
+        body main #filter-wrapper #the-map .legend {
+          background-color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          padding: 8px;
+          border-radius: 3px; }
+          body main #filter-wrapper #the-map .legend > div span {
+            width: 16px;
+            height: 12px;
+            display: inline-block;
+            margin-right: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            background-color: #d7dbdd;
+            vertical-align: baseline; }
+          body main #filter-wrapper #the-map .legend #selected-label span {
+            background-color: #70b6e5; }
+          body main #filter-wrapper #the-map .legend #not-selectable-label span {
+            background-color: #fff; }
     body main #viewports-wrapper {
       height: calc(100% - 12px);
       flex-basis: calc(60% - 12px); }
@@ -266,6 +283,9 @@ body {
 .legend text {
   font-family: sans-serif;
   font-size: 8px; }
+
+.legend-page-navigation {
+  cursor: pointer; }
 
 .axisTitle text {
   font-family: sans-serif;

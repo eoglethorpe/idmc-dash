@@ -16,7 +16,7 @@ var csvJSON = function(csv){
     return result;
 };
 
-var loadRiskModelaad = function(data){
+var loadRiskModelaad = function(data, code='iso3'){
     filters.reset();
 
     data = csvJSON(data);
@@ -31,33 +31,62 @@ var loadRiskModelaad = function(data){
         // Add hazard types to filters
         filters.addHazardType(d.analysis_type, d.hazard);
 
-        if (aadDataModel.hasOwnProperty(d.iso3)){
-            if (aadDataModel[d.iso3].hasOwnProperty(d.analysis_type)){
-                aadDataModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+        if (aadDataModel.hasOwnProperty(d[code])){
+            if (aadDataModel[d[code]].hasOwnProperty(d.analysis_type)){
+                aadDataModel[d[code]][d.analysis_type][d.hazard] = parseFloat(d.aad);
             }else{
-                aadDataModel[d.iso3][d.analysis_type] = {};
-                aadDataModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+                aadDataModel[d[code]][d.analysis_type] = {};
+                aadDataModel[d[code]][d.analysis_type][d.hazard] = parseFloat(d.aad);
             }
         }else{
-            aadDataModel[d.iso3] = {};
-            aadDataModel[d.iso3][d.analysis_type] = {};
-            aadDataModel[d.iso3][d.analysis_type][d.hazard] = parseFloat(d.aad);
+            aadDataModel[d[code]] = {};
+            aadDataModel[d[code]][d.analysis_type] = {};
+            aadDataModel[d[code]][d.analysis_type][d.hazard] = parseFloat(d.aad);
         }
-
-        if (!aadCountries[d.analysis_type]) {
-            aadCountries[d.analysis_type] = {};
+        if(code === 'iso3'){
+            if (!aadCountries[d.analysis_type]) {
+                aadCountries[d.analysis_type] = {};
+            }
+            if (!aadCountries[d.analysis_type][d.hazard]) {
+                aadCountries[d.analysis_type][d.hazard] = [];
+            }
+            if (aadCountries[d.analysis_type][d.hazard].indexOf(d[code]) < 0) {
+                aadCountries[d.analysis_type][d.hazard].push(d[code]);
+            }
         }
-        if (!aadCountries[d.analysis_type][d.hazard]) {
-            aadCountries[d.analysis_type][d.hazard] = [];
+        else if(code === 'geographical_group'){
+            if (!aadGeoGroups[d.analysis_type]) {
+                aadGeoGroups[d.analysis_type] = {};
+            }
+            if (!aadGeoGroups[d.analysis_type][d.hazard]) {
+                aadGeoGroups[d.analysis_type][d.hazard] = [];
+            }
+            if (aadGeoGroups[d.analysis_type][d.hazard].indexOf(d.geographical_group) < 0) {
+                aadGeoGroups[d.analysis_type][d.hazard].push(d.geographical_group);
+            }
         }
-        if (aadCountries[d.analysis_type][d.hazard].indexOf(d.iso3) < 0) {
-            aadCountries[d.analysis_type][d.hazard].push(d.iso3);
+        else if(code === 'income_group'){
+            if (!aadIncomeGroups[d.analysis_type]) {
+                aadIncomeGroups[d.analysis_type] = {};
+            }
+            if (!aadIncomeGroups[d.analysis_type][d.hazard]) {
+                aadIncomeGroups[d.analysis_type][d.hazard] = [];
+            }
+            if (aadIncomeGroups[d.analysis_type][d.hazard].indexOf(d.income_group) < 0) {
+                aadIncomeGroups[d.analysis_type][d.hazard].push(d.income_group);
+            }
         }
     });
-
-
     filters.reload();
 };
+
+var loadGeoGroupModel = function(data){
+    loadRiskModelaad(data, 'geographical_group');
+}
+
+var loadIncomeGroupModel = function(data){
+    loadRiskModelaad(data, 'income_group');
+}
 
 var loadRiskModel = function(data, risk){
     let get_hazard = function(d){
@@ -142,6 +171,24 @@ var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
                 drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
             }
          });
+         $.ajax({
+             type: "GET",
+             url: "static/data/aad_geo_groups.csv",
+             dataType: "text",
+             success: function(data) {
+                loadGeoGroupModel(data);
+                //  drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
+             }
+          });
+          $.ajax({
+              type: "GET",
+              url: "static/data/aad_income_groups.csv",
+              dataType: "text",
+              success: function(data) {
+                 loadIncomeGroupModel(data);
+                 //  drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
+              }
+           });
     });
 };
 
@@ -164,25 +211,25 @@ var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport){
 $(document).ready(function(){
     let countries =
         [
-            //"BDI", "BEN", "BFA", "BWA",
-        //"CAF", "CIV", "CMR", "COD",
-        //"COG", "COM", "CPV", "DJI",
-        //"DZA", "EGY", "ERI", "ESH",
-        //"ETH", "GAB", "GHA", "GIN",
-        //"GMB", "GNB", "GNQ", "KEN",
-        //"LBR", "LBY", "LSO", "MAR",
-        //"MDG", "MLI", "MOZ", "MRT",
+            // "BDI", "BEN", "BFA", "BWA",
+        // "CAF", "CIV", "CMR", "COD",
+        // "COG", "COM", "CPV", "DJI",
+        // "DZA", "EGY", "ERI", "ESH",
+        // "ETH", "GAB", "GHA", "GIN",
+        // "GMB", "GNB", "GNQ", "KEN",
+        // "LBR", "LBY", "LSO", "MAR",
+        // "MDG", "MLI", "MOZ", "MRT",
             "MUS", "MWI",
             "ARG"
         ],
         hazards = {
             "prospective":[
-                //"earthquake","flood"
+                // "earthquake","flood"
                 //,"tsunami","storm","wind"
             ],
             "retrospective":[
                 "hydrometeorological",
-                //"landslides",
+                // "landslides",
                 //"tectonic","volcanic","total"
             ],
             "hybrid":[
@@ -200,13 +247,13 @@ $(document).ready(function(){
     // $('.expand-graph').click(function(){
     //     console.log('asd');
     //     drawAadBar(aadDataModel, filters.getSelectedHazards(),
-    //                filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
+    //                filters.getSelectedTypeList(), filters.getSelectedRegions(), "#expanded-viewport");
     // });
 
-    $('.countries-select').change(function(){
+    $('.countries-select, .income-group-select, .geo-region-select').change(function(){
         drawAadBar(aadDataModel, filters.getSelectedHazards(),
-                   filters.getSelectedTypeList(), filters.getSelectedCountry(), "#viewport-chart");
+                    filters.getSelectedTypeList(), filters.getSelectedRegions(), "#viewport-chart");
         drawRiskChart(riskDataModel, filters.getSelectedHazards(),
-                      filters.getSelectedTypeList(), filters.getSelectedCountry(), "#viewport-graph");
+                    filters.getSelectedTypeList(), filters.getSelectedRegions(), "#viewport-graph");
     });
 });

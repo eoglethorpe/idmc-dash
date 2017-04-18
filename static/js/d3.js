@@ -597,26 +597,50 @@ var DrawBarChart = function(){
                         return 'translate(0,' + y + ')';
                     })
                 if (cPage > 1){
-                    pageNav
+                    let back = pageNav.append('rect');
+                    let text = pageNav
                         .append('text')
-                        .attr('x', 0)
-                        .attr('y', 5)
-                        .attr('font-size', '10px')
-                        .text('<')
+                        .attr('x', 4)
+                        .attr('y', 16)
+                        .attr('font-size', '13px')
+                        .html('&#xf100 Previous')
+                        .on('click', function(){
+                            drawLegends(legendWrapper, legendArray, legendIsH,
+                                        legendArray.length, legendPerPage, cPage-1);
+                        });
+                    back.attr('x', 0)
+                        .attr('y', 16 - text.node().getBBox().height)
+                        .attr('fill', '#fff')
+                        .attr('stroke-width', 1)
+                        .attr('stroke', 'rgba(0, 0, 0, 0.2)')
+                        .attr('width', text.node().getBBox().width + 16)
+                        .attr('height', text.node().getBBox().height + 8)
                         .on('click', function(){
                             drawLegends(legendWrapper, legendArray, legendIsH,
                                         legendArray.length, legendPerPage, cPage-1);
                         });
                 }if (cPage < total/perPage){
-                    pageNav
+                    let back = pageNav.append('rect');
+                    let text = pageNav
                         .append('text')
-                        .attr('x', 1.5*20)
-                        .attr('y', 5)
-                        .attr('font-size', '10px')
-                        .text('>')
+                        .attr('x', 102)
+                        .attr('y', 16)
+                        .attr('font-size', '13px')
+                        .html('Next &#xf101')
                         .on('click', function(){
                             drawLegends(legendWrapper, legendArray, legendIsH,
                                         legendArray.length, legendPerPage, cPage+1);
+                        });
+                    back.attr('x', 98)
+                        .attr('y', 16 - text.node().getBBox().height)
+                        .attr('fill', '#fff')
+                        .attr('stroke-width', 1)
+                        .attr('stroke', 'rgba(0, 0, 0, 0.2)')
+                        .attr('width', text.node().getBBox().width + 16)
+                        .attr('height', text.node().getBBox().height + 8)
+                        .on('click', function(){
+                            drawLegends(legendWrapper, legendArray, legendIsH,
+                                        legendArray.length, legendPerPage, cPage-1);
                         });
                 }
             }
@@ -635,7 +659,7 @@ var DrawBarChart = function(){
             });
         }
         let legendPadding = 15,
-            legendPerPage = 10,
+            legendPerPage = 11,
             legendIsH = hazardsList.length>1?true:false,
             legendArray = hazardsList.length>1?hazardsList:countries,
             legendPages = legendArray.length/legendPerPage;
@@ -801,7 +825,7 @@ var DrawBarChart = function(){
             .append("text")
             .text(iso3ToShortName(maxString));
 
-        paddingWL = vLayout?30:axisTextSvg.select('text').node().getBBox().width;
+        paddingWL = vLayout?30:axisTextSvg.select('text').node().getBBox().width + 2;
         axisTextSvg.remove();
 
         labelScale.domain(
