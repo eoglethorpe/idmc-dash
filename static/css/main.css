@@ -298,17 +298,41 @@ body {
 .button-wrapper {
   float: right;
   position: absolute;
+  display: flex;
+  align-items: center;
   right: 5px;
-  top: 5px; }
-
-.button-wrapper > button {
-  cursor: pointer;
-  background-color: #073861;
-  text-transform: uppercase;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-weight: bold;
-  padding: 6px 16px; }
+  top: 5px;
+  justify-content: space-between; }
+  .button-wrapper button {
+    cursor: pointer;
+    background-color: #073861;
+    text-transform: uppercase;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 16px;
+    order: 2;
+    height: 36px; }
+  .button-wrapper .data-select {
+    display: flex;
+    box-sizing: border-box;
+    height: 36px;
+    margin-right: 12px; }
+    .button-wrapper .data-select label {
+      cursor: pointer;
+      text-transform: uppercase;
+      border: none;
+      outline: none;
+      display: flex;
+      align-items: center;
+      font-size: 0.9em;
+      color: #414141;
+      padding: 4px 8px 0 8px;
+      order: 1; }
+      .button-wrapper .data-select label input {
+        display: none; }
+      .button-wrapper .data-select label.active {
+        border-bottom: 2px solid #073861; }
 
 /*# sourceMappingURL=main.css.map */

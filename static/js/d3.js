@@ -715,13 +715,35 @@ var DrawBarChart = function(){
                 resetted();
             });
 
-        d3.select(documentId)
-             .select(".button-wrapper")
-             .append("button")
-             .html('<i class="fa fa-toggle-on"></i>')
-             .on("click", function(){
-                new DrawBarChart().init().drawPath(documentId, dataset, hazards, showType, countries, !overPop, barPadding);
-             });
+        let dataSelection = d3.select(documentId)
+            .select(".button-wrapper").append("div").attr('class','data-select');
+        let dataSelectionLabelAbsolute = dataSelection.append('label').attr('class', 'active')
+            .on('click', function(){
+                $('#viewport-graph .button-wrapper .active').removeClass('active');
+                new DrawBarChart().init().drawPath(documentId, dataset, hazards, showType, countries, false, barPadding);
+                $(this).addClass('active');
+            });
+        dataSelectionLabelAbsolute.append("input")
+            .attr('type', 'radio')
+            .attr('name', 'data-selection')
+            .attr('value', 'Absolute')
+            .html('Absolute');
+        dataSelectionLabelAbsolute.html(dataSelectionLabelAbsolute.html() + 'Absolute');
+        let dataSelectionLabelRelative = dataSelection.append('label')
+            .on('click', function(){
+                let that = $('#viewport-graph .button-wrapper .active').removeClass('active');
+                $(this).addClass('active');
+                new DrawBarChart().init().drawPath(documentId, dataset, hazards, showType, countries, true, barPadding);
+            });
+        dataSelectionLabelRelative.append("input")
+            .attr('type', 'radio')
+            .attr('name', 'data-selection')
+            .attr('value', 'Relative')
+            .html('Relative');
+        dataSelectionLabelRelative.html(dataSelectionLabelRelative.html() + 'Relative');
+
+            //  .on("click", function(){
+            //  });
         /*
          d3.select(documentId)
              .select(".button-wrapper")
@@ -1098,14 +1120,32 @@ var DrawBarChart = function(){
             .append("div")
             .attr("class", "button-wrapper");
 
-        d3.select(documentId)
-             .select(".button-wrapper")
-             .append("button")
-             .html('<i class="fa fa-toggle-on"></i>')
-             .on("click", function(){
-                new DrawBarChart().init().drawBar(documentId, datasetC,
-                    hazards, showType, layout, !overPop, barPadding);
-             });
+        let dataSelection = d3.select(documentId)
+            .select(".button-wrapper").append("div").attr('class','data-select');
+        let dataSelectionLabelAbsolute = dataSelection.append('label').attr('class', 'active')
+            .on('click', function(){
+                $('#viewport-chart .button-wrapper .active').removeClass('active');
+                new DrawBarChart().init().drawBar(documentId, datasetC, hazards, showType, layout, false, barPadding);
+                $(this).addClass('active');
+            });
+        dataSelectionLabelAbsolute.append("input")
+            .attr('type', 'radio')
+            .attr('name', 'data-selection')
+            .attr('value', 'Absolute')
+            .html('Absolute');
+        dataSelectionLabelAbsolute.html(dataSelectionLabelAbsolute.html() + 'Absolute');
+        let dataSelectionLabelRelative = dataSelection.append('label')
+            .on('click', function(){
+                let that = $('#viewport-chart .button-wrapper .active').removeClass('active');
+                $(this).addClass('active');
+                new DrawBarChart().init().drawBar(documentId, datasetC, hazards, showType, layout, true, barPadding);
+            });
+        dataSelectionLabelRelative.append("input")
+            .attr('type', 'radio')
+            .attr('name', 'data-selection')
+            .attr('value', 'Relative')
+            .html('Relative');
+        dataSelectionLabelRelative.html(dataSelectionLabelRelative.html() + 'Relative');
 
         let gXSize = gX.selectAll('.tick text').size();
         if ( gXSize > 25){

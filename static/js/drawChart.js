@@ -185,7 +185,6 @@ var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
              dataType: "text",
              success: function(data) {
                 loadGeoGroupModel(data);
-                //  drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
              }
           });
           $.ajax({
@@ -194,7 +193,6 @@ var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
               dataType: "text",
               success: function(data) {
                  loadIncomeGroupModel(data);
-                 //  drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
               }
            });
     });
