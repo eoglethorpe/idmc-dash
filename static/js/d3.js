@@ -820,7 +820,7 @@ var DrawBarChart = function(){
             yScale.range([height-paddingH, axisPadding*paddingH]);
             xScale.range([axisPadding*paddingWL, width-paddingWR], .9);
         }
-        labelScale.range([-30, width-paddingWR]);
+        labelScale.range([0, width-paddingWR]);
 
         //Clear previous html
         parent.html('');
@@ -1019,9 +1019,8 @@ var DrawBarChart = function(){
         let legend = svg.append("g")
                 .attr('class', 'legend')
                 .attr('transform', function(d) {
-                    var h = 0;
-                    var x = width*.05;
-                    var y = 10 + h;
+                    var x = 0;
+                    var y = paddingH - 4;
                 return 'translate(' + x + ',' + y + ')';
             })
 
