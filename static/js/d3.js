@@ -154,11 +154,13 @@ var DrawBarChart = function(){
                         .attr("class", "tooltip")
                         .style("opacity", 0);
 
-    var toolTipMouseover = function(d, i, node){
+    var toolTipMouseover = function(d, i, node, overPop=false){
         // for risk upper chart
         if(d.displacement && d.frequency){
             toolTip
-                .html('Displacement(X): <strong>'+d3.format(",")(d.displacement)+'</strong>'+
+                .html((!overPop?'Displacement(X): <strong>'+d3.format(",")(d.displacement)+'</strong>':'')+
+                      (overPop?'Displacement Over Population(X): <strong>'+d3.format(",")(d.displacement_over_pop)+'</strong>':'')+
+                      //'<br>Population: <strong>'+d3.format(",")(d.population)+'</strong>'+
                       '<br>Frequency(Y): <strong>'+d3.format(",")(d.frequency)+'</strong>'+
                       '<br>Country: <strong>'+iso3ToShortName(d.data.country)+'</strong>'+
                       '<br>Type: <strong>'+d.data.type.toProperCase()+'</strong>'+
@@ -174,7 +176,7 @@ var DrawBarChart = function(){
             .html('Country: '+iso3ToShortName(d[0].data.x)+
                   '<br>Type: <strong>'+d[0].data.type.toProperCase()+'</strong>'+
                   '<br>Hazard: <strong>'+d.key.toProperCase()+'</strong>'+
-                  '<br>AAD: <strong>'+d3.format(",")
+                  '<br>AAD'+(overPop?' Over Population':'')+': <strong>'+d3.format(",")
                     (d.skip?d.d:d[0][1]-d[0][0])+'</strong>')
         };
         //remainig tooltip for visibility and postion
@@ -202,8 +204,9 @@ var DrawBarChart = function(){
     }
 
     // draw upper chart(line chart)
-    this.drawPath = function(documentId, dataset, hazards, showType, countries, barPadding = 1) {
+    this.drawPath = function(documentId, dataset, hazards, showType, countries, overPop=false, barPadding = 1) {
 
+        let displacementKey = overPop?'displacement_over_pop':'displacement';
         let yScale = d3.scaleLog(),
             yScaleS = d3.scaleLog(),
             xScale = d3.scaleLog();
@@ -228,13 +231,13 @@ var DrawBarChart = function(){
                             if (yScaleMin === undefined){
                                 yScaleMin = data.frequency;
                                 yScaleMax = data.frequency ;
-                                xScaleMin = data.displacement ;
+                                xScaleMin = data[displacementKey] ;
                             }else{
                                 yScaleMin = Math.min(yScaleMin, data.frequency);
                                 yScaleMax = Math.max(yScaleMax, data.frequency); // y-axis
                                 xScaleMin = Math.min(xScaleMin, data.displacement); // y-axis
                             }
-                            return data.displacement; // x-axis
+                            return data[displacementKey]; // x-axis
                         })
                     })
                 })
@@ -350,12 +353,12 @@ var DrawBarChart = function(){
         // function to generate lines
         var lineFunction = d3.line()
                              .x(function(d, i) {
-                                 return xScale(d.displacement);
+                                 return xScale(d[displacementKey]);
                              })
                              .y(function(d, i) { return yScale(d.frequency); }),
         // function to generate area
             CAreaFunction = d3.area()
-                .x(function(d){return xScale(d.displacement);})
+                .x(function(d){return xScale(d[displacementKey]);})
                 .y0(function(d){return yScale(d.frequency+d.displacement_stat_error);})
                 .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);}),
 
@@ -497,7 +500,7 @@ var DrawBarChart = function(){
                         })
                         .enter()
                         .append("circle")
-                        .attr("cx", function(d, i) { return xScale(d.displacement); })
+                        .attr("cx", function(d, i) { return xScale(d[displacementKey]); })
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
                         //.style("fill", getColor('line',keyC, keyA, keyH))
                         .attr("fill",
@@ -505,7 +508,7 @@ var DrawBarChart = function(){
                         .on("click", function(d, i){
                             createPreview(pathView, circleView, areaView);
                         })
-                        .on("mouseover", function(d, i){toolTipMouseover(d, i, this);})
+                        .on("mouseover", function(d, i){toolTipMouseover(d, i, this, overPop);})
                         .on("mousemove", toolTipMousemove)
                         .on("mouseout", function(d, i){
                             toolTipMouseout(d, i, this);
@@ -712,15 +715,24 @@ var DrawBarChart = function(){
                 resetted();
             });
 
-        // d3.select(documentId)
-        //     .select(".button-wrapper")
-        //     .append("button")
-        //     .html('<i class="fa fa-expand expand-graph"></i>')
-        //     .on("click", function(){
-        //         // $('footer').show();
-        //         // drawRiskChart(riskDataModel, filters.getSelectedHazards(),
-        //                     //   filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
-        //     });
+        d3.select(documentId)
+             .select(".button-wrapper")
+             .append("button")
+             .html('<i class="fa fa-toggle-on"></i>')
+             .on("click", function(){
+                new DrawBarChart().init().drawPath(documentId, dataset, hazards, showType, countries, !overPop, barPadding);
+             });
+        /*
+         d3.select(documentId)
+             .select(".button-wrapper")
+             .append("button")
+             .html('<i class="fa fa-expand expand-graph"></i>')
+             .on("click", function(){
+                  $('footer').show();
+                  drawRiskChart(riskDataModel, filters.getSelectedHazards(),
+                                filters.getSelectedTypeList(), filters.getSelectedCountry(), "#expanded-viewport");
+             });
+         */
 
         // zoom-out at the starting for better visibility
         /*
@@ -775,9 +787,10 @@ var DrawBarChart = function(){
 
     };
 
-    this.drawBar = function(documentId, datasetC, hazards, showType, layout="vertical", barPadding = 1) {
+    this.drawBar = function(documentId, datasetC, hazards, showType, layout="vertical", overPop=false, barPadding = 1) {
 
         let vLayout = layout.toUpperCase() === 'VERTICAL'?true:false;
+        let aadKey = overPop?'aad_over_pop':'aad';
         let dataset = datasetC.slice();
         let yScale = d3.scaleBand(),
             xScale = d3.scaleLinear(),
@@ -798,11 +811,11 @@ var DrawBarChart = function(){
                 for(let type in data){
                     if(showType.indexOf(type) === -1){continue;}
                     if(data[type]['total'] != undefined){
-                        max = Math.max(max, data[type]['total']);
+                        max = Math.max(max, data[type]['total'][aadKey]);
                     }else{
                         let newmax = 0;
                         for(let e in data[type]){
-                            newmax += data[type][e];
+                            newmax += data[type][e][aadKey];
                         }
                         max = Math.max(max, newmax);
                     }
@@ -971,7 +984,12 @@ var DrawBarChart = function(){
                     }
                     return false;
                 });
-                keys.sort(function(a, b){ return data[a]-data[b]; });
+                keys.forEach(function(d){
+                    if (hazards[data.type].indexOf(d.toLowerCase()) != -1){
+                        data[d] = data[d][aadKey];
+                    }
+                });
+                keys.sort(function(a, b){ return data[a][aadKey]-data[b][aadKey]; });
                 let newDataset =  d3.stack().keys(keys)
                                     .order(d3.stackOrderNone)
                                     .offset(d3.stackOffsetNone)([data]);
@@ -995,7 +1013,7 @@ var DrawBarChart = function(){
                 return getColorForHazard(labelScale.domain(), d.key);
             })
             .on("mouseover", function(d, i){
-                toolTipMouseover(d, i, this);
+                toolTipMouseover(d, i, this, overPop);
             })
             .on("mousemove",toolTipMousemove)
             .on("mouseout", function(d, i){
@@ -1074,6 +1092,20 @@ var DrawBarChart = function(){
                 return Math.min(labelScale.bandwidth()/11, 15);
             })
             .text(function(d){return d.toProperCase();});
+
+        d3.select(documentId)
+            .style('position', 'relative')
+            .append("div")
+            .attr("class", "button-wrapper");
+
+        d3.select(documentId)
+             .select(".button-wrapper")
+             .append("button")
+             .html('<i class="fa fa-toggle-on"></i>')
+             .on("click", function(){
+                new DrawBarChart().init().drawBar(documentId, datasetC,
+                    hazards, showType, layout, !overPop, barPadding);
+             });
 
         let gXSize = gX.selectAll('.tick text').size();
         if ( gXSize > 25){

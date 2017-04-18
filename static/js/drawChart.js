@@ -17,6 +17,12 @@ var csvJSON = function(csv){
 };
 
 var loadRiskModelaad = function(data, code='iso3'){
+    let get_aad = function(d){
+        return {
+            'aad': parseFloat(d.aad),
+            'aad_over_pop': parseFloat(d.aad_over_pop)
+        };
+    }
     filters.reset();
 
     data = csvJSON(data);
@@ -33,15 +39,15 @@ var loadRiskModelaad = function(data, code='iso3'){
 
         if (aadDataModel.hasOwnProperty(d[code])){
             if (aadDataModel[d[code]].hasOwnProperty(d.analysis_type)){
-                aadDataModel[d[code]][d.analysis_type][d.hazard] = parseFloat(d.aad);
+                aadDataModel[d[code]][d.analysis_type][d.hazard] = get_aad(d);
             }else{
                 aadDataModel[d[code]][d.analysis_type] = {};
-                aadDataModel[d[code]][d.analysis_type][d.hazard] = parseFloat(d.aad);
+                aadDataModel[d[code]][d.analysis_type][d.hazard] = get_aad(d);
             }
         }else{
             aadDataModel[d[code]] = {};
             aadDataModel[d[code]][d.analysis_type] = {};
-            aadDataModel[d[code]][d.analysis_type][d.hazard] = parseFloat(d.aad);
+            aadDataModel[d[code]][d.analysis_type][d.hazard] = get_aad(d);
         }
         if(code === 'iso3'){
             if (!aadCountries[d.analysis_type]) {
@@ -93,7 +99,9 @@ var loadRiskModel = function(data, risk){
         let data =  {
             'frequency': parseFloat(d.frequency),
             'return_period': parseFloat(d.return_period),
-            'displacement': parseFloat(d.displacement)
+            'displacement': parseFloat(d.displacement),
+            'displacement_over_pop': parseFloat(d.displacement_over_pop),
+            'population': parseFloat(d.population)
         }
         if(d.hasOwnProperty('displacement_stat_error')){
             data['displacement_stat_error'] =  parseFloat(d.displacement_stat_error);
@@ -164,7 +172,7 @@ var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
     $(document).ready(function() {
         $.ajax({
             type: "GET",
-            url: "static/data/risk_model_aad.csv",
+            url: "static/data/aad.csv",
             dataType: "text",
             success: function(data) {
                 loadRiskModelaad(data);
@@ -194,13 +202,13 @@ var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
 
 var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport){
     $.when(
-        $.get('static/data/risk_model_hybrid.csv', function(data){
+        $.get('static/data/hybrid_dec.csv', function(data){
                 loadRiskModel(data, 'hybrid');
         }),
-        $.get('static/data/risk_model_prospective.csv', function(data){
+        $.get('static/data/prospective_dec.csv', function(data){
                 loadRiskModel(data, 'prospective');
         }),
-        $.get('static/data/risk_model_retrospective.csv', function(data){
+        $.get('static/data/retrospective_dec.csv', function(data){
                 loadRiskModel(data, 'retrospective');
         })
     ).then(function() {
@@ -229,7 +237,7 @@ $(document).ready(function(){
             ],
             "retrospective":[
                 "hydrometeorological",
-                // "landslides",
+                 "landslides",
                 //"tectonic","volcanic","total"
             ],
             "hybrid":[
