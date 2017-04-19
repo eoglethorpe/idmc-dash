@@ -626,7 +626,7 @@ var DrawBarChart = function(){
                     let back = pageNav.append('rect');
                     let text = pageNav
                         .append('text')
-                        .attr('x', 102)
+                        .attr('x', cPage>1?102:0)
                         .attr('y', 16)
                         .attr('font-size', '13px')
                         .html('Next &#xf101')
@@ -634,7 +634,7 @@ var DrawBarChart = function(){
                             drawLegends(legendWrapper, legendArray, legendIsH,
                                         legendArray.length, legendPerPage, cPage+1);
                         });
-                    back.attr('x', 98)
+                    back.attr('x', cPage>1?98:-4)
                         .attr('y', 16 - text.node().getBBox().height)
                         .attr('fill', '#fff')
                         .attr('stroke-width', 1)
