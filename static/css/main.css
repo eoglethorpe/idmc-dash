@@ -269,16 +269,26 @@ body {
   font: 12px sans-serif;
   position: absolute; }
 
+svg text {
+  font-family: FontAwesome; }
+
 .axis path,
 .axis line {
   fill: none;
-  stroke: #eeebeb;
-  stroke-dasharray: "2,2";
+  stroke: #e4e4e4;
+  stroke-dasharray: 2,2;
   shape-rendering: crispEdges; }
+  .axis path.x-minor,
+  .axis line.x-minor {
+    stroke: #f4f4f4; }
+  .axis path.y-minor,
+  .axis line.y-minor {
+    stroke: #fafafa; }
 
 .axis text {
   font-family: sans-serif;
-  font-size: 7px; }
+  font-size: 9px;
+  fill: #545454; }
 
 .legend text {
   font-family: sans-serif;
@@ -293,7 +303,11 @@ body {
   fill: #b9aaaa;
   text-anchor: middle;
   text-transform: uppercase;
-  letter-spacing: 0.1em; }
+  letter-spacing: 0.01em; }
+
+h4.graphTitle {
+  position: absolute;
+  top: 5px; }
 
 .button-wrapper {
   float: right;
@@ -317,7 +331,7 @@ body {
   .button-wrapper .data-select {
     display: flex;
     box-sizing: border-box;
-    height: 36px;
+    height: 16px;
     margin-right: 12px; }
     .button-wrapper .data-select label {
       cursor: pointer;
@@ -333,6 +347,7 @@ body {
       .button-wrapper .data-select label input {
         display: none; }
       .button-wrapper .data-select label.active {
-        border-bottom: 2px solid #073861; }
+        border-bottom: 2px solid #073861;
+        padding: 5px; }
 
 /*# sourceMappingURL=main.css.map */

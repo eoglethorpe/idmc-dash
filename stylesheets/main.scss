@@ -382,16 +382,26 @@ body{
   font: 12px sans-serif;
   position: absolute;
 }
+svg text {
+   font-family: FontAwesome;
+}
 .axis path,
 .axis line {
     fill: none;
-    stroke: #eeebeb;
-    stroke-dasharray: "2,2";
+    stroke: #e4e4e4;
+    stroke-dasharray: 2,2;
     shape-rendering: crispEdges;
+    &.x-minor {
+        stroke: #f4f4f4;
+    }
+    &.y-minor {
+        stroke: #fafafa;
+    }
 }
 .axis text {
     font-family: sans-serif;
-    font-size: 7px;
+    font-size: 9px;
+    fill: #545454;
 }
 
 .legend text {
@@ -407,9 +417,13 @@ body{
     fill: #b9aaaa;
     text-anchor: middle;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.01em;
 }
 
+h4.graphTitle {
+    position: absolute;
+    top: 5px;
+}
 .button-wrapper {
     float: right;
     position: absolute;
@@ -434,7 +448,7 @@ body{
     .data-select{
         display: flex;
         box-sizing: border-box;
-        height: 36px;
+        height: 16px;
         margin-right: 12px;
 
         label{
@@ -454,6 +468,7 @@ body{
             }
             &.active{
                 border-bottom: 2px solid $primary-color;
+                padding:5px;
             }
         }
     }

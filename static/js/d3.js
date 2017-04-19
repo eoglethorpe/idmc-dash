@@ -132,13 +132,21 @@ var DrawBarChart = function(){
                 return superscript[c];
             }).join("");
     };
-    var tickFormatLog = function(d){
+    var tickFormatLog = function(d, node, axis='y'){
         if (powerOfTen(d)){
-            return d3.format(",")(d);
+            return d3.format(",.5")(d);
+            /*
             let tenPower = Math.round(Math.log(d) / Math.LN10),
                 sign = '';
             if(tenPower < 0){sign = '⁻'};
             return 10 + sign + formatPower(Math.round(Math.log(d) / Math.LN10));
+            */
+        }else{
+            if (axis === 'x'){
+                d3.select(node.parentNode).select('line').attr('class', 'x-minor');
+            }else{
+                d3.select(node.parentNode).select('line').attr('class', 'y-minor');
+            }
         }
         //only show 10^x tick
         //return d3.format(".1s")(d);
@@ -216,7 +224,9 @@ var DrawBarChart = function(){
         let width = parent.width(),
             height = parent.height(),
             hPadding = 25,
-            wPadding = 65;
+            wPadding = 51;
+        parent.width(parent.width());
+        parent.height(parent.height());
 
         let yScaleMin,
             yScaleMax,
@@ -242,8 +252,8 @@ var DrawBarChart = function(){
                     })
                 })
         });
-        // yScale.domain([0, max frequency])
-        yScale.domain([yScaleMin, yScaleMax]);
+         yScale.domain([0.000001, 500]);
+        //yScale.domain([yScaleMin, yScaleMax]);
         yScaleS.domain([1/yScaleMin, 1/yScaleMax]);
         xScale.domain([xScaleMin, xScaleMax]);
 
@@ -254,18 +264,20 @@ var DrawBarChart = function(){
 
         //Clear previous html
         parent.html('');
+        parent.append($("<h4></h4>").addClass('graphTitle').html('Displacement Exceedance Curve'));
+
         let xAxis = d3.axisBottom(xScale)
                     .tickSize(-height+2*hPadding)
-                    .tickFormat(tickFormatLog)
-                    .tickValues(tickValuesLog),
+                    .tickFormat(function(d){return tickFormatLog(d, this, 'x');}),
+                    //.tickValues(tickValuesLog),
             yAxis = d3.axisLeft(yScale)
                     .tickSize(-width+2*wPadding)
-                    .tickValues(tickValuesLog)
-                    .tickFormat(tickFormatLog),
+                    //.tickValues(tickValuesLog)
+                    .tickFormat(function(d){return tickFormatLog(d, this);}),
             yAxisS = d3.axisRight(yScaleS)
                     .tickSize('4')
-                    .tickFormat(tickFormatLog)
-                    .tickValues(tickValuesLog);
+                    //.tickValues(tickValuesLog)
+                    .tickFormat(function(d){return tickFormatLog(d, this);});
 
         // main container for this chart
         let svg = d3.select(documentId)
@@ -296,24 +308,12 @@ var DrawBarChart = function(){
             .attr("transform", "translate(" +(width-wPadding) + ",0)")
             .call(yAxisS);
 
-        // change line to dot-dot lines
-        // needed to execute everytime if zoom event generate new line
-        // or TODO: add a css rule
-        let axisLineDot = function(){
-            gX.selectAll(".tick line")
-                .attr("stroke-dasharray", "2,2");
-            gY.selectAll(".tick line")
-                .attr("stroke-dasharray", "2,2");
-        };
-
-        axisLineDot();
-
         // add axis legends
         let axisTitle = svg.append("g")
             .attr('class', 'axisTitle')
 
         axisTitle.append('text')//y-axis P
-            .text('displacement exceedance rate [events/year]')
+            .text('displacement exceedance rate [events/years]')
             .attr('transform',
                 'translate(10,'+(height/2)+')rotate(-90)')
         axisTitle.append('text')//y-axis S
@@ -445,8 +445,8 @@ var DrawBarChart = function(){
                         .attr("stroke",
                             hazardsList.length>1?getColorForHazard(null, keyH):getColor('area', keyC, keyC, keyC))
                         .attr("stroke-width", function(){
-                            if (keyA === 'prospective'){return 1;}
-                            if (keyA === 'retrospective'){return 1;}
+                            if (keyA === 'prospective'){return 3;}
+                            if (keyA === 'retrospective'){return 3;}
                             return 3;
                         })
                         .attr("stroke-dasharray", function(){
@@ -558,8 +558,8 @@ var DrawBarChart = function(){
                     legend.append('path')
                         .attr('d', 'M0,0L20,0')
                         .attr('stroke-width', function(){
-                            if (d.type === 'prospective'){return 1;}
-                            if (d.type === 'retrospective'){return 1;}
+                            if (d.type === 'prospective'){return 3;}
+                            if (d.type === 'retrospective'){return 3;}
                             return 3;
                         })
                         .style('stroke', getColorForHazard(null, d.hazard))
@@ -574,7 +574,7 @@ var DrawBarChart = function(){
                 }else{
                     legend.append('rect')
                         .attr('width', '20px')
-                        .attr('height', '5px')
+                        .attr('height', '3px')
                         .style('fill', getColor('area', d, d, d))
                         .on("mouseover", function(){
                             //view.moveToFront();
@@ -643,7 +643,7 @@ var DrawBarChart = function(){
                         .attr('height', text.node().getBBox().height + 8)
                         .on('click', function(){
                             drawLegends(legendWrapper, legendArray, legendIsH,
-                                        legendArray.length, legendPerPage, cPage-1);
+                                        legendArray.length, legendPerPage, cPage+1);
                         });
                 }
             }
@@ -677,7 +677,7 @@ var DrawBarChart = function(){
 
         // define zoom with extend and callback
         let zoom = d3.zoom()
-            .scaleExtent([.4, 1000])
+            .scaleExtent([.4, 10])
             .translateExtent([[-500, -500], [width + 500, height + 500]])
             .on("zoom", zoomed);
 
@@ -716,34 +716,40 @@ var DrawBarChart = function(){
             });
 
         let dataSelection = d3.select(documentId)
-            .select(".button-wrapper").append("div").attr('class','data-select');
-        let dataSelectionLabelAbsolute = dataSelection.append('label').attr('class', 'active')
-            .on('click', function(){
-                $('#viewport-graph .button-wrapper .active').removeClass('active');
-                new DrawBarChart().init().drawPath(documentId, dataset, hazards, showType, countries, false, barPadding);
-                $(this).addClass('active');
-            });
-        dataSelectionLabelAbsolute.append("input")
-            .attr('type', 'radio')
-            .attr('name', 'data-selection')
-            .attr('value', 'Absolute')
-            .html('Absolute');
-        dataSelectionLabelAbsolute.html(dataSelectionLabelAbsolute.html() + 'Absolute');
-        let dataSelectionLabelRelative = dataSelection.append('label')
-            .on('click', function(){
-                let that = $('#viewport-graph .button-wrapper .active').removeClass('active');
-                $(this).addClass('active');
-                new DrawBarChart().init().drawPath(documentId, dataset, hazards, showType, countries, true, barPadding);
-            });
-        dataSelectionLabelRelative.append("input")
-            .attr('type', 'radio')
-            .attr('name', 'data-selection')
-            .attr('value', 'Relative')
-            .html('Relative');
-        dataSelectionLabelRelative.html(dataSelectionLabelRelative.html() + 'Relative');
+            .select(".button-wrapper")
+            .append("div")
+            .attr('class','data-select');
 
-            //  .on("click", function(){
-            //  });
+        dataSelection
+            .append('label')
+            .attr('class', !overPop?'active':'')
+            .on('click', function(){
+                if (overPop){
+                    new DrawBarChart().init().drawPath(documentId, dataset, hazards,
+                                                       showType, countries, false, barPadding);
+                }
+            })
+            .html('Absolute')
+            .append("input")
+            .attr('type', 'radio')
+            .attr('name', 'data-selection')
+            .attr('value', 'Absolute');
+
+        dataSelection
+            .append('label')
+            .attr('class', overPop?'active':'')
+            .on('click', function(){
+                if (!overPop){
+                    new DrawBarChart().init().drawPath(documentId, dataset, hazards,
+                                                       showType, countries, true, barPadding);
+                }
+            })
+            .html('Relative')
+            .append("input")
+            .attr('type', 'radio')
+            .attr('name', 'data-selection')
+            .attr('value', 'Relative');
+
         /*
          d3.select(documentId)
              .select(".button-wrapper")
@@ -796,7 +802,6 @@ var DrawBarChart = function(){
           gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
           gY.call(yAxis.scale(d3.event.transform.rescaleY(yScale)));
           gYS.call(yAxisS.scale(d3.event.transform.rescaleY(yScaleS)));
-          axisLineDot();
         }
 
         // reset position defined as scale of .9
@@ -826,6 +831,8 @@ var DrawBarChart = function(){
             paddingWR = 5,
             paddingH = 25,
             paddingWL = 20;
+        parent.width(parent.width());
+        parent.height(parent.height());
 
         let xScaleMin = 0,
             xScaleMax = d3.max(dataset, function(data) {
@@ -883,6 +890,7 @@ var DrawBarChart = function(){
 
         //Clear previous html
         parent.html('');
+        parent.append($("<h4></h4>").addClass('graphTitle').html('Average Annual Displacement'));
 
         let xAxis = d3.axisBottom(vLayout?yScale:xScale)
                     .tickSize(-height+2*paddingH),
@@ -921,14 +929,6 @@ var DrawBarChart = function(){
             .attr("class", "axis")
             .attr("transform", "translate(" + paddingWL + ",0)")
             .call(yAxis);
-
-        let axisLineDot = function(){
-            gY.selectAll(".tick line")
-                .attr("stroke-dasharray", "2,2");
-        };
-
-        axisLineDot();
-
 
         let axisTitle = svg.append("g")
             .attr('class', 'axisTitle')
@@ -1016,7 +1016,7 @@ var DrawBarChart = function(){
                                     .order(d3.stackOrderNone)
                                     .offset(d3.stackOffsetNone)([data]);
                 if (skipTotal){
-                    newDataset.splice(0, 0, {d:data['total'], key:'total', skip: true, 0:{'data': data}});
+                    newDataset.splice(0, 0, {d:data['total'][aadKey], key:'total', skip: true, 0:{'data': data}});
                 }
                 return newDataset;
             })
@@ -1111,44 +1111,49 @@ var DrawBarChart = function(){
             .attr('x', function(d){return labelScale(d);})
             .attr('y', function(d){return -2;})
             .style("font-size", function(d){
-                return Math.min(labelScale.bandwidth()/11, 15);
+                return Math.min(labelScale.bandwidth()/9, 15);
             })
             .text(function(d){return d.toProperCase();});
 
-        d3.select(documentId)
-            .style('position', 'relative')
-            .append("div")
-            .attr("class", "button-wrapper");
-
         let dataSelection = d3.select(documentId)
-            .select(".button-wrapper").append("div").attr('class','data-select');
-        let dataSelectionLabelAbsolute = dataSelection.append('label').attr('class', 'active')
+                .style('position', 'relative')
+                .append("div")
+                .attr("class", "button-wrapper")
+                .append("div")
+                .attr('class','data-select');
+
+        dataSelection
+            .append('label')
+            .attr('class', !overPop?'active':'')
             .on('click', function(){
-                $('#viewport-chart .button-wrapper .active').removeClass('active');
-                new DrawBarChart().init().drawBar(documentId, datasetC, hazards, showType, layout, false, barPadding);
-                $(this).addClass('active');
-            });
-        dataSelectionLabelAbsolute.append("input")
+                if (overPop){
+                    new DrawBarChart().init().drawBar(documentId, datasetC, hazards,
+                                                      showType, layout, false, barPadding);
+                }
+            })
+            .html("Absolute")
+            .append("input")
             .attr('type', 'radio')
             .attr('name', 'data-selection')
-            .attr('value', 'Absolute')
-            .html('Absolute');
-        dataSelectionLabelAbsolute.html(dataSelectionLabelAbsolute.html() + 'Absolute');
-        let dataSelectionLabelRelative = dataSelection.append('label')
+            .attr('value', 'Absolute');
+
+        dataSelection
+            .append('label')
+            .attr('class', overPop?'active':'')
             .on('click', function(){
-                let that = $('#viewport-chart .button-wrapper .active').removeClass('active');
-                $(this).addClass('active');
-                new DrawBarChart().init().drawBar(documentId, datasetC, hazards, showType, layout, true, barPadding);
-            });
-        dataSelectionLabelRelative.append("input")
+                if (!overPop){
+                    new DrawBarChart().init().drawBar(documentId, datasetC, hazards,
+                                                      showType, layout, true, barPadding);
+                }
+            })
+            .html("Relative")
+            .append("input")
             .attr('type', 'radio')
             .attr('name', 'data-selection')
-            .attr('value', 'Relative')
-            .html('Relative');
-        dataSelectionLabelRelative.html(dataSelectionLabelRelative.html() + 'Relative');
+            .attr('value', 'Relative');
 
         let gXSize = gX.selectAll('.tick text').size();
-        if ( gXSize > 25){
+        if (vLayout && gXSize > 25){
             gX.selectAll('.tick text')
                 .transition()
                 .duration(2000)
