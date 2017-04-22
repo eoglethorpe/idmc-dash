@@ -1,5 +1,5 @@
 $primary-color: #073861;
-$header-height: 80px;
+$header-height: 72px;
 
 body{
     margin: 0;
@@ -35,14 +35,22 @@ body{
         z-index: 1;
         background-color: #fff;
         box-shadow: 0 5px 10px -5px rgba(0 , 0, 0, 0.3);
+        padding-left: 16px;
 
+        img{
+            height: 54%;
+            width: auto;
+            object-fit: contain;
+        }
         h1{
             margin: 0 16px;
+            align-items: baseline;
+            margin-bottom: -8px;
         }
     }
     main{
         height: calc(100vh - #{$header-height});
-        flex-basis: 80%;
+        flex-basis: 84%;
         margin: auto;
         display: flex;
         flex-wrap: wrap;
@@ -57,7 +65,7 @@ body{
         }
         #filter-wrapper{
             height: calc(100% - 12px);
-            flex-basis: calc(40% - 24px);
+            flex-basis: calc(36% - 24px);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -104,6 +112,7 @@ body{
 
                     h3{
                         flex-basis: 80%;
+                        text-transform: capitalize;
                     }
                     .fa{
                         cursor: pointer;
@@ -276,7 +285,7 @@ body{
         }
         #viewports-wrapper{
             height: calc(100% - 12px);
-            flex-basis: calc(60% - 12px);
+            flex-basis: calc(64% - 12px);
 
             #viewport-graph{
                 height: calc(60% - 12px);
@@ -326,33 +335,84 @@ body{
             height: 64px;
         }
         main{
-            flex-basis: 90%;
+            flex-basis: 92%;
             height: calc(100vh - 64px);
+
+            // #filter-wrapper{
+            //     flex-basis: calc(35% - 24px);
+            // }
+            // #viewports-wrapper{
+            //     flex-basis: calc(65% - 12px);
+            // }
         }
     }
     @media screen and (max-width: 1080px) {
         header{
             height: 56px;
+
+            h1{
+                font-size: 1.5em;
+            }
         }
         main{
-            flex-basis: 96%;
+            flex-basis: 98%;
             height: calc(100vh - 56px);
+
+            // #filter-wrapper{
+            //     flex-basis: calc(35% - 24px);
+            // }
+            // #viewports-wrapper{
+            //     flex-basis: calc(65% - 12px);
+            // }
         }
     }
     @media screen and (max-width: 720px) {
         header{
             padding: 4px 0 12px 0;
-            height: auto;
         }
         main{
             flex-basis: 100%;
             height: auto;
 
+            #filter-wrapper{
+                flex-basis: 100%;
+
+                #the-map{
+                    height: 300px;
+                    flex-basis: 100%;
+                }
+            }
+            #viewports-wrapper{
+                flex-basis: 98%;
+                margin-top: 12px;
+
+                #viewport-graph, #viewport-chart{
+                    height: 60vh;
+                }
+            }
+        }
+    }
+    @media screen and (max-width: 540px) {
+        header{
+            padding: 4px 0 12px 0;
+
+            h1{
+                font-size: 1.2em;
+            }
+        }
+        main{
+            flex-basis: 100%;
+            height: auto;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin: auto;
+            overflow: scroll;
+
             .card{
                 margin: 6px 0;
             }
             #filter-wrapper{
-                flex-basis: 100%;
+                flex-basis: 100vw;
                 height: auto;
 
                 #the-map{
@@ -361,13 +421,24 @@ body{
                 }
             }
             #viewports-wrapper{
-                flex-basis: 98%;
+                flex-basis: 720px;
+                flex-shrink: 0;
+                flex-grow: 0;
+                overflow-x: hidden;
 
                 #viewport-graph{
-                    height: auto;
+                    padding-bottom: 54px;
+                    height: 60vh;
                 }
                 #viewport-chart{
-                    height: auto;
+                    padding-bottom: 54px;
+                    height: 100vh;
+                }
+                .button-wrapper{
+                    top: 32px;
+                }
+                svg{
+                    margin-top: 54px;
                 }
             }
         }
@@ -399,20 +470,25 @@ svg text {
     }
 }
 .axis text {
-    font-family: sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 9px;
     fill: #545454;
 }
 
 .legend text {
-    font-family: sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 8px;
 }
 .legend-page-navigation{
     cursor: pointer;
+
+    text{
+        font-family: 'Open Sans', sans-serif;
+        text-transform: uppercase;
+    }
 }
 .axisTitle text {
-    font-family: sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 10px;
     fill: #b9aaaa;
     text-anchor: middle;
@@ -448,7 +524,7 @@ h4.graphTitle {
     .data-select{
         display: flex;
         box-sizing: border-box;
-        height: 16px;
+        height: 20px;
         margin-right: 12px;
 
         label{
@@ -458,17 +534,19 @@ h4.graphTitle {
             outline: none;
             display: flex;
             align-items: center;
-            font-size: 0.9em;
+            font-size: 12px;
             color: #414141;
-            padding: 4px 8px 0 8px;
+            padding: 4px 8px;
+            padding-bottom: 3px;
+            box-sizing: border-box;
             order: 1;
 
             input{
                 display: none;
             }
             &.active{
-                border-bottom: 2px solid $primary-color;
-                padding:5px;
+                border-bottom: 1px solid $primary-color;
+                padding-bottom: 3px;
             }
         }
     }

@@ -22,16 +22,23 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    height: 80px;
+    height: 72px;
     margin: 0;
     z-index: 1;
     background-color: #fff;
-    box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.3); }
+    box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.3);
+    padding-left: 16px; }
+    body header img {
+      height: 54%;
+      width: auto;
+      object-fit: contain; }
     body header h1 {
-      margin: 0 16px; }
+      margin: 0 16px;
+      align-items: baseline;
+      margin-bottom: -8px; }
   body main {
-    height: calc(100vh - 80px);
-    flex-basis: 80%;
+    height: calc(100vh - 72px);
+    flex-basis: 84%;
     margin: auto;
     display: flex;
     flex-wrap: wrap;
@@ -44,7 +51,7 @@ body {
       padding: 24px; }
     body main #filter-wrapper {
       height: calc(100% - 12px);
-      flex-basis: calc(40% - 24px);
+      flex-basis: calc(36% - 24px);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -81,7 +88,8 @@ body {
           border-top: 1px solid rgba(7, 56, 97, 0.4);
           border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
           body main #filter-wrapper #filters .step-separation h3 {
-            flex-basis: 80%; }
+            flex-basis: 80%;
+            text-transform: capitalize; }
           body main #filter-wrapper #filters .step-separation .fa {
             cursor: pointer;
             font-size: 16px;
@@ -204,7 +212,7 @@ body {
             background-color: #fff; }
     body main #viewports-wrapper {
       height: calc(100% - 12px);
-      flex-basis: calc(60% - 12px); }
+      flex-basis: calc(64% - 12px); }
       body main #viewports-wrapper #viewport-graph {
         height: calc(60% - 12px);
         width: 98%;
@@ -230,35 +238,67 @@ body {
     body header {
       height: 64px; }
     body main {
-      flex-basis: 90%;
+      flex-basis: 92%;
       height: calc(100vh - 64px); } }
   @media screen and (max-width: 1080px) {
     body header {
       height: 56px; }
+      body header h1 {
+        font-size: 1.5em; }
     body main {
-      flex-basis: 96%;
+      flex-basis: 98%;
       height: calc(100vh - 56px); } }
   @media screen and (max-width: 720px) {
     body header {
-      padding: 4px 0 12px 0;
-      height: auto; }
+      padding: 4px 0 12px 0; }
     body main {
       flex-basis: 100%;
       height: auto; }
+      body main #filter-wrapper {
+        flex-basis: 100%; }
+        body main #filter-wrapper #the-map {
+          height: 300px;
+          flex-basis: 100%; }
+      body main #viewports-wrapper {
+        flex-basis: 98%;
+        margin-top: 12px; }
+        body main #viewports-wrapper #viewport-graph, body main #viewports-wrapper #viewport-chart {
+          height: 60vh; } }
+  @media screen and (max-width: 540px) {
+    body header {
+      padding: 4px 0 12px 0; }
+      body header h1 {
+        font-size: 1.2em; }
+    body main {
+      flex-basis: 100%;
+      height: auto;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin: auto;
+      overflow: scroll; }
       body main .card {
         margin: 6px 0; }
       body main #filter-wrapper {
-        flex-basis: 100%;
+        flex-basis: 100vw;
         height: auto; }
         body main #filter-wrapper #the-map {
           flex-basis: 100%;
           height: 300px; }
       body main #viewports-wrapper {
-        flex-basis: 98%; }
+        flex-basis: 720px;
+        flex-shrink: 0;
+        flex-grow: 0;
+        overflow-x: hidden; }
         body main #viewports-wrapper #viewport-graph {
-          height: auto; }
+          padding-bottom: 54px;
+          height: 60vh; }
         body main #viewports-wrapper #viewport-chart {
-          height: auto; } }
+          padding-bottom: 54px;
+          height: 100vh; }
+        body main #viewports-wrapper .button-wrapper {
+          top: 32px; }
+        body main #viewports-wrapper svg {
+          margin-top: 54px; } }
 
 .tooltip {
   z-index: 10;
@@ -286,19 +326,22 @@ svg text {
     stroke: #fafafa; }
 
 .axis text {
-  font-family: sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 9px;
   fill: #545454; }
 
 .legend text {
-  font-family: sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 8px; }
 
 .legend-page-navigation {
   cursor: pointer; }
+  .legend-page-navigation text {
+    font-family: 'Open Sans', sans-serif;
+    text-transform: uppercase; }
 
 .axisTitle text {
-  font-family: sans-serif;
+  font-family: 'Open Sans', sans-serif;
   font-size: 10px;
   fill: #b9aaaa;
   text-anchor: middle;
@@ -331,7 +374,7 @@ h4.graphTitle {
   .button-wrapper .data-select {
     display: flex;
     box-sizing: border-box;
-    height: 16px;
+    height: 20px;
     margin-right: 12px; }
     .button-wrapper .data-select label {
       cursor: pointer;
@@ -340,14 +383,16 @@ h4.graphTitle {
       outline: none;
       display: flex;
       align-items: center;
-      font-size: 0.9em;
+      font-size: 12px;
       color: #414141;
-      padding: 4px 8px 0 8px;
+      padding: 4px 8px;
+      padding-bottom: 3px;
+      box-sizing: border-box;
       order: 1; }
       .button-wrapper .data-select label input {
         display: none; }
       .button-wrapper .data-select label.active {
-        border-bottom: 2px solid #073861;
-        padding: 5px; }
+        border-bottom: 1px solid #073861;
+        padding-bottom: 3px; }
 
 /*# sourceMappingURL=main.css.map */
