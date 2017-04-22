@@ -168,37 +168,40 @@ var drawAadBar = function(aadDataModel, hazards, typeList, countries, viewport){
     new DrawBarChart().init().drawBar(viewport, arrayDataBar, hazards, typeList, 'horizontal');
 };
 
-var loadAndDrawBarChart = function(countries, hazards, typeList, viewport){
+var loadAndDrawBarChart = function(countries, hazards, typeList, viewport, draw=false){
     $(document).ready(function() {
-        $.ajax({
-            type: "GET",
-            url: "static/data/aad.csv",
-            dataType: "text",
-            success: function(data) {
-                loadRiskModelaad(data);
-                drawAadBar(aadDataModel, hazards, typeList, countries, viewport);
-            }
-         });
-         $.ajax({
-             type: "GET",
-             url: "static/data/aad_geo_groups.csv",
-             dataType: "text",
-             success: function(data) {
-                loadGeoGroupModel(data);
-             }
-          });
-          $.ajax({
-              type: "GET",
-              url: "static/data/aad_income_groups.csv",
-              dataType: "text",
-              success: function(data) {
-                 loadIncomeGroupModel(data);
-              }
-           });
+        $.when(
+            $.ajax({
+                type: "GET",
+                url: "static/data/aad.csv",
+                dataType: "text",
+                success: function(data) {
+                    loadRiskModelaad(data);
+                }
+             }),
+             $.ajax({
+                 type: "GET",
+                 url: "static/data/aad_geo_groups.csv",
+                 dataType: "text",
+                 success: function(data) {
+                    loadGeoGroupModel(data);
+                 }
+              }),
+              $.ajax({
+                  type: "GET",
+                  url: "static/data/aad_income_groups.csv",
+                  dataType: "text",
+                  success: function(data) {
+                     loadIncomeGroupModel(data);
+                  }
+               })
+        ).then(function(){
+            draw?drawAadBar(aadDataModel, hazards, typeList, countries, viewport):'';
+        });
     });
 };
 
-var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport){
+var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport, draw=false){
     $.when(
         $.get('static/data/hybrid_dec.csv', function(data){
                 loadRiskModel(data, 'hybrid');
@@ -210,7 +213,7 @@ var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport){
                 loadRiskModel(data, 'retrospective');
         })
     ).then(function() {
-        drawRiskChart(riskDataModel, hazards, typeList, countries, viewport);
+        draw?drawRiskChart(riskDataModel, hazards, typeList, countries, viewport):'';
     });
 };
 
@@ -224,28 +227,29 @@ $(document).ready(function(){
          //"ETH", "GAB", "GHA", "GIN",
          //"GMB", "GNB", "GNQ", "KEN",
          "LBR", "LBY", "LSO", "MAR",
-         "MDG", "MLI", "MOZ", "MRT",
+         //"MDG", "MLI", "MOZ", "MRT",
             "MUS", "MWI",
             "ARG"
         ],
         hazards = {
             "prospective":[
-                 //"earthquake","flood"
-                //,"tsunami","storm","wind"
+                 "earthquake","flood"
+                ,"tsunami","storm","wind"
             ],
             "retrospective":[
-                //"hydrometeorological",
-                 //"landslides",
-                //"tectonic","volcanic","total"
+                "hydrometeorological",
+                 "landslides",
+                "tectonic","volcanic","total"
             ],
             "hybrid":[
                 "total"
             ]
         },
-        typeList = ['prospective', 'retrospective', 'hybrid'];
+        typeList = ['prospective', 'retrospective', 'hybrid'],
+    drawInitially = true;
 
-    loadAndDrawBarChart(countries, hazards, typeList, "#viewport-chart");
-    loadAndDrawRiskChart(countries, hazards, typeList, '#viewport-graph');
+    loadAndDrawBarChart(countries, hazards, typeList, "#viewport-chart", drawInitially);
+    loadAndDrawRiskChart(countries, hazards, typeList, '#viewport-graph', drawInitially);
 
     $('#clear-filter-btn').click(function(){
         filters.clear();
