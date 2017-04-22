@@ -217,12 +217,12 @@ var loadAndDrawRiskChart = function(countries, hazards, typeList, viewport){
 $(document).ready(function(){
     let countries =
         [
-             "BDI", "BEN", "BFA", "BWA",
-         "CAF", "CIV", "CMR", "COD",
-         "COG", "COM", "CPV", "DJI",
-         "DZA", "EGY", "ERI", "ESH",
-         "ETH", "GAB", "GHA", "GIN",
-         "GMB", "GNB", "GNQ", "KEN",
+             //"BDI", "BEN", "BFA", "BWA",
+         //"CAF", "CIV", "CMR", "COD",
+         //"COG", "COM", "CPV", "DJI",
+         //"DZA", "EGY", "ERI", "ESH",
+         //"ETH", "GAB", "GHA", "GIN",
+         //"GMB", "GNB", "GNQ", "KEN",
          "LBR", "LBY", "LSO", "MAR",
          "MDG", "MLI", "MOZ", "MRT",
             "MUS", "MWI",

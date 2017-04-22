@@ -157,10 +157,12 @@ var DrawBarChart = function(){
     };
 
     //for showing info
-    var toolTip = d3.select("body")
-                        .append("div")
-                        .attr("class", "tooltip")
-                        .style("opacity", 0);
+    var toolTip = !d3.select('div.tooltip').empty()
+                ?d3.select('div.tooltip')
+                :d3.select("body")
+                    .append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
 
     var toolTipMouseover = function(d, i, node, overPop=false){
         // for risk upper chart
@@ -264,6 +266,13 @@ var DrawBarChart = function(){
 
         //Clear previous html
         parent.html('');
+        /*
+        parent.on('mousedown', function(){
+            $('div').not(this).css('z-index', '100');
+            $(this).css('z-index', '1000');
+        });
+        parent.draggable().resizable().resizable('destroy').resizable();
+        */
         parent.append($("<h4></h4>").addClass('graphTitle').html('Displacement Exceedance Curve'));
 
         let xAxis = d3.axisBottom(xScale)
@@ -890,6 +899,13 @@ var DrawBarChart = function(){
 
         //Clear previous html
         parent.html('');
+        /*
+        parent.on('mousedown', function(){
+            $('div').not(this).css('z-index', '100');
+            $(this).css('z-index', '1000');
+        });
+        parent.draggable().resizable().resizable('destroy').resizable();
+        */
         parent.append($("<h4></h4>").addClass('graphTitle').html('Average Annual Displacement'));
 
         let xAxis = d3.axisBottom(vLayout?yScale:xScale)

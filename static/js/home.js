@@ -327,4 +327,11 @@ $(document).ready(function(){
         countriesGeoData = data;
         refreshMap();
     });
+    /*
+    $('#filter-wrapper').on('mousedown', function(){
+            $('div').not(this).css('z-index', '100');
+            $(this).css('z-index', '1000');
+    }).draggable();
+    //.resizable().resizable('destroy').resizable();
+    */
 });
