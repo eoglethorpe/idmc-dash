@@ -892,7 +892,7 @@ var DrawBarChart = function(){
             return d.x;
         }));
         if (!vLayout){
-            paddingWL = axisTextSvg.node().getBBox().width+1;
+            paddingWL = axisTextSvg.node().getBBox().width+5;
         }
         axisTextSvg.remove();
 
@@ -1152,7 +1152,7 @@ var DrawBarChart = function(){
             */
             .text(function(d){return d.toProperCase();})
             .attr('transform', function(d){
-                let scaleBy = (labelScale.bandwidth()/d3.select(this).node().getBBox().width);
+                let scaleBy = (labelScale.bandwidth()/(d3.select(this).node().getBBox().width+5));
                 return 'scale('+Math.min(2, scaleBy)+')';
             });
 

@@ -226,7 +226,7 @@ $(document).ready(function(){
          //"DZA", "EGY", "ERI", "ESH",
          //"ETH", "GAB", "GHA", "GIN",
          //"GMB", "GNB", "GNQ", "KEN",
-         "LBR", "LBY", "LSO", "MAR",
+         //"LBR", "LBY", "LSO", "MAR",
          //"MDG", "MLI", "MOZ", "MRT",
             "MUS", "MWI",
             "ARG"
@@ -234,12 +234,12 @@ $(document).ready(function(){
         hazards = {
             "prospective":[
                  "earthquake","flood"
-                ,"tsunami","storm","wind"
+                //,"tsunami","storm","wind"
             ],
             "retrospective":[
                 "hydrometeorological",
                  "landslides",
-                "tectonic","volcanic","total"
+                //"tectonic","volcanic","total"
             ],
             "hybrid":[
                 "total"
