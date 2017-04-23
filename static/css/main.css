@@ -213,6 +213,10 @@ body {
     body main #viewports-wrapper {
       height: calc(100% - 12px);
       flex-basis: calc(64% - 12px); }
+      body main #viewports-wrapper .wait-text {
+        color: #f0f0f0;
+        text-align: center;
+        flex-basis: 100%; }
       body main #viewports-wrapper #viewport-graph {
         height: calc(60% - 12px);
         width: 98%;
