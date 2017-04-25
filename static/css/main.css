@@ -28,10 +28,12 @@ body {
     background-color: #fff;
     box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.3);
     padding-left: 16px; }
-    body header img {
+    body header a {
       height: 54%;
-      width: auto;
-      object-fit: contain; }
+      width: auto; }
+      body header a img {
+        height: 100%;
+        object-fit: contain; }
     body header h1 {
       margin: 0 16px;
       align-items: baseline;
