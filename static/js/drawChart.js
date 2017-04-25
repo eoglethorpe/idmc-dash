@@ -228,24 +228,28 @@ $(document).ready(function(){
          //"GMB", "GNB", "GNQ", "KEN",
          //"LBR", "LBY", "LSO", "MAR",
          //"MDG", "MLI", "MOZ", "MRT",
-            "MUS", "MWI",
-            "ARG"
+            //Colombia, Ethiopia, Indonesia and Sri Lanka
+            "COL", "ETH", "IDN" , "LKA"
+            //"MUS", "MWI",
+            //"ARG"
         ],
         hazards = {
             "prospective":[
                  "earthquake","flood"
-                //,"tsunami","storm","wind"
+                ,"tsunami","storm","wind"
             ],
             "retrospective":[
                 "hydrometeorological",
                  "landslides",
-                //"tectonic","volcanic","total"
+                "tectonic","volcanic","total"
             ],
             "hybrid":[
                 "total"
             ]
         },
-        typeList = ['prospective', 'retrospective', 'hybrid'],
+        typeList = [
+            //'prospective', 'retrospective',
+            'hybrid'],
     drawInitially = true;
 
     loadAndDrawBarChart(countries, hazards, typeList, "#viewport-chart", drawInitially);
