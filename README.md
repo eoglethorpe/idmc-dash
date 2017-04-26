@@ -42,7 +42,8 @@ Page folder structure:
 > - `index.html` contains html.
 > - `static/` folder contains css, js, image and data files.
 > - `scss_watch.py` converts scss into css. (run once after scss files are changed)
-> - Change location in index.html if structure is different(for css, data, imgs and js).
+> - Change location in `index.html` if structure is changed(for css, data, imgs and js).
+> - Change location of data file in `static/js/drawChart.js`, if structure of data files location is changed.
 
 ##### For style update in future:
 > - Don't edit files in .css files. Instead edit .scss files.
