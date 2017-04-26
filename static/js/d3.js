@@ -213,7 +213,7 @@ var DrawBarChart = function(){
             .duration(100)
             .style("opacity", 0)
             .style("visibility", 'hidden');
-        unFadeBar(d3.select(node));
+        if (node){unFadeBar(d3.select(node));}
     }
 
     let getDisplacementData = function(d, overPop) {
@@ -263,7 +263,7 @@ var DrawBarChart = function(){
                     })
                 })
         });
-         yScale.domain([0.000001, 500]);
+         yScale.domain([0.000005 , yScaleMax]);
         //yScale.domain([yScaleMin, yScaleMax]);
         yScaleS.domain([1/yScale.domain()[0], 1/yScale.domain()[1]]);
         xScale.domain([xScaleMin, xScaleMax]);
@@ -381,13 +381,15 @@ var DrawBarChart = function(){
                 .y1(function(d){return yScale(d.frequency-d.displacement_stat_error);}),
 
         // function to generate preview(Preview is front of all the other nodes)
-            createPreview = function(pathView, circleView, areaView){
+            createPreview = function(pathView, fullPathView, circleView, areaView){
                 // move node to previous wrapper
                 var reAppendChildren = function(){
                     let previewCircle = previewWrapper.select('g').node(),
-                        previewLine = previewWrapper.select('path.risk-line').node();
+                        previewLine = previewWrapper.select('path.risk-line').node(),
+                        previewFullLine = previewWrapper.select('path.risk-line-full').node();
                     if (previewCircle) {circleWrapper.node().appendChild(previewCircle)};
                     if (previewLine) {pathWrapper.node().appendChild(previewLine)};
+                    if (previewFullLine) {fullPathWrapper.node().appendChild(previewFullLine)};
                     previewWrapper.selectAll("*").remove();
                 }
 
@@ -399,11 +401,26 @@ var DrawBarChart = function(){
                 }
                 // here nodes are moved, they should be moved back.
                 previewWrapper.node().appendChild(pathView.node());
+                previewWrapper.node().appendChild(fullPathView.node());
                 previewWrapper.node().appendChild(circleView.node());
 
                 previewWrapper.on("click", function(){
                     reAppendChildren();
                 });
+            },
+            pathTooltipInfo = function(data){
+                toolTip.html(`
+                    Country: <strong>${iso3ToShortName(data.country)}</strong><br>
+                    Type: <strong>${data.type.toProperCase()}</strong><br>
+                    Hazard: <strong>${data.hazard.toProperCase()}</strong><br>
+                    `);
+                toolTip
+                    .transition()
+                    .duration(200)
+                    .style("opacity", .9)
+                    .style("left", (d3.event.pageX + 10) + "px")
+                    .style("top", (d3.event.pageY - 60) + "px")
+                    .style("visibility", 'visible');
             };
 
         let hazardsList = [].concat.apply([],
@@ -424,6 +441,7 @@ var DrawBarChart = function(){
 
             areaWrapper = clipWrapper.append("g").attr('class', 'areaWrapper'), // for error area
             pathWrapper = clipWrapper.append("g").attr('class', 'pathWrapper'), //for lines
+            fullPathWrapper = clipWrapper.append("g").attr('class', 'fullPathWrapper'), //for lines
             circleWrapper = clipWrapper.append("g").attr('class', 'circleWrapper'), // for circles(points)
             previewWrapper = clipWrapper.append("g").attr('class', 'previewWrapper'), // for preview
             legendWrapper = clipWrapper.append("g").attr('class', 'legendWrapper'); // for legends
@@ -431,6 +449,7 @@ var DrawBarChart = function(){
         // to pass zoom transition, see zoom callback
         views.push(areaWrapper);
         views.push(pathWrapper);
+        views.push(fullPathWrapper);
         views.push(circleWrapper);
         views.push(previewWrapper);
 
@@ -443,7 +462,11 @@ var DrawBarChart = function(){
                     if (hazards[keyA].indexOf(keyH) == -1 ){continue;} // filter with hazards
                     let datasetH = dataset[keyC][keyA][keyH];
 
-                    let areaView = null;
+                    let areaView = null,
+                        pathView = pathWrapper.append("path"),
+                        fullPathView = fullPathWrapper.append("path"),
+                        circleView = circleWrapper.append("g");
+
                     if (datasetH.length && datasetH[0].hasOwnProperty('displacement_stat_error')){
                         // draw area if error is provided in the data
                         areaView = areaWrapper.append("path")
@@ -453,23 +476,15 @@ var DrawBarChart = function(){
                                 .style("opacity", 0.4);
                     }
 
-                    let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH};
+                    let circleData = {'country': keyC, 'type': keyA, 'hazard': keyH},
+                        lineData = lineFunction(datasetH);
 
-                    let pathView = pathWrapper.append("path")
-                        .attr('tooltip-data', JSON.stringify(circleData))
-                        .attr("d", lineFunction(datasetH))
+                    pathView
+                        .attr("d", lineData)
                         .attr('class', 'risk-line')
-                        //.attr("stroke", getColor('line', keyC, keyA, keyH))
                         .attr("stroke",
                             hazardsList.length>1?getColorForHazard(null, keyH):getColor('area', keyC, keyC, keyC))
-                        .attr("stroke-width", function(){
-                            return 5;
-                            /*
-                            if (keyA === 'prospective'){return 3;}
-                            if (keyA === 'retrospective'){return 3;}
-                            return 3;
-                            */
-                        })
+                        .attr("stroke-width", 5)
                         .attr("stroke-dasharray", function(){
                             if (hazardsList.length === 1) {return "";}
                             if (keyA === 'prospective'){return "2,2";}
@@ -478,39 +493,33 @@ var DrawBarChart = function(){
                         })
                         .attr("fill", "none")
                         .on("mouseover", function(){
-                            let line = d3.select(this),
-                                data = JSON.parse(d3.select(this).attr('tooltip-data'));
+                            let line = d3.select(this);
                             line.attr('old-stroke', line.attr('stroke'));
                             line.attr('stroke', d3.color(line.attr('stroke')).brighter(.4));
-                            toolTip.html(`
-                                Country: <strong>${iso3ToShortName(data.country)}</strong><br>
-                                Type: <strong>${data.type.toProperCase()}</strong><br>
-                                Hazard: <strong>${data.hazard.toProperCase()}</strong><br>
-                                `);
-                            toolTip
-                                .transition()
-                                .duration(200)
-                                .style("opacity", .9)
-                                .style("left", (d3.event.pageX + 10) + "px")
-                                .style("top", (d3.event.pageY - 60) + "px")
-                                .style("visibility", 'visible');
                         })
                         .on("mousemove", toolTipMousemove)
                         .on("mouseout", function(){
                             let line = d3.select(this);
                             line.attr("stroke", line.attr('old-stroke'));
-                            toolTip
-                                .transition()
-                                .duration(100)
-                                .style("opacity", 0)
-                                .style("visibility", 'hidden');
-                        })
-                        .on("click", function(d, i){
-                            createPreview(pathView, circleView, areaView);
                         });
 
+                    fullPathView.attr("class", "risk-line-full")
+                        .attr("d", lineData)
+                        .attr("tooltip-data", JSON.stringify(circleData))
+                        .attr("stroke-width", 10)
+                        .attr("stroke", "black")
+                        .attr("fill", "none")
+                        .style("opacity", 0)
+                        .on("mousemove", toolTipMousemove)
+                        .on("mouseover", function(){
+                            pathTooltipInfo(JSON.parse(d3.select(this).attr('tooltip-data')));
+                        })
+                        .on("mouseout", function(){
+                            toolTipMouseout();
+                        }).on("click", function(d, i){
+                            createPreview(pathView, fullPathView, circleView, areaView);
+                        });
 
-                    let circleView = circleWrapper.append("g");
                     circleView.selectAll("circle")
                         .data(function(){
                             return datasetH.map(function (e, i) {
@@ -523,11 +532,10 @@ var DrawBarChart = function(){
                         .append("circle")
                         .attr("cx", function(d, i) { return xScale(getDisplacementData(d[displacementKey], overPop)); })
                         .attr("cy", function(d, i) { return yScale(d.frequency); })
-                        //.style("fill", getColor('line',keyC, keyA, keyH))
                         .attr("fill",
                               hazardsList.length>1?getColorForHazard(null, keyH):getColor('area', keyC, keyC, keyC))
                         .on("click", function(d, i){
-                            createPreview(pathView, circleView, areaView);
+                            createPreview(pathView, fullPathView, circleView, areaView);
                         })
                         .on("mouseover", function(d, i){toolTipMouseover(d, i, this, overPop);})
                         .on("mousemove", toolTipMousemove)
@@ -811,7 +819,7 @@ var DrawBarChart = function(){
                         dasharray = dasharray.split(',');
                         if (dasharray.length === 2){
                             return parseFloat(dasharray[0])/d3.event.transform.k+
-                                    ','+ parseFloat(dasharray[0])/d3.event.transform.k ;
+                                    ','+ parseFloat(dasharray[1])/d3.event.transform.k ;
                     }}return '';
                   });
               view.selectAll("circle")
