@@ -134,16 +134,12 @@ var DrawBarChart = function(){
     };
     var tickFormatLog = function(d, node, axis='y'){
         if (powerOfTen(d)){
-            if (axis === 'x'){
-                return d3.format(",")(d);
-            }
-            return d3.format(",.5")(d);
-            /*
+            if (axis === 'x'){return d3.format(",")(d);}
+            //return d3.format(",.5")(d);
             let tenPower = Math.round(Math.log(d) / Math.LN10),
-                sign = '';
-            if(tenPower < 0){sign = '⁻'};
+                sign = tenPower<0?'⁻':'';
+            if (Math.abs(tenPower) < 6){return d3.format(",")(d);}
             return 10 + sign + formatPower(Math.round(Math.log(d) / Math.LN10));
-            */
         }else{
             if (axis === 'x'){
                 d3.select(node.parentNode).select('line').attr('class', 'x-minor');
