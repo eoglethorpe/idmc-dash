@@ -1,310 +1,271 @@
-body {
+body .main label {
+  -webkit-user-select: none; }
+body .main h1, body .main h2, body .main h3, body .main h4 {
   margin: 0;
+  text-transform: uppercase;
+  color: #073861; }
+body .main * {
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif; }
+body .main a {
+  text-decoration: none; }
+body .main .card {
+  background-color: #fff;
+  box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  padding: 24px; }
+body .main #filter-wrapper {
+  height: calc(90vh - 12px);
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   flex-wrap: wrap;
-  justify-content: center;
-  background-color: #f0f0f0;
-  font-size: 14px;
-  font-weight: 400; }
-  body * {
-    box-sizing: border-box;
-    font-family: 'Open Sans', sans-serif; }
-  body label {
-    -webkit-user-select: none; }
-  body h1, body h2, body h3, body h4 {
-    margin: 0;
-    text-transform: uppercase;
-    color: #073861; }
-  body a {
-    text-decoration: none; }
-  body header {
+  overflow-y: auto; }
+  body .main #filter-wrapper #filters {
     flex-basis: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    height: 72px;
-    margin: 0;
-    z-index: 1;
-    background-color: #fff;
-    box-shadow: 0 5px 10px -5px rgba(0, 0, 0, 0.3);
-    padding-left: 16px; }
-    body header a {
-      height: 54%;
-      width: auto; }
-      body header a img {
-        height: 100%;
-        object-fit: contain; }
-    body header h1 {
-      margin: 0 16px;
-      align-items: baseline;
-      margin-bottom: -8px; }
-  body main {
-    height: calc(100vh - 72px);
-    flex-basis: 84%;
-    margin: auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: center; }
-    body main .card {
-      background-color: #fff;
-      box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.3);
-      box-sizing: border-box;
-      padding: 24px; }
-    body main #filter-wrapper {
-      height: calc(100% - 12px);
-      flex-basis: calc(36% - 24px);
+    align-self: flex-start; }
+    body .main #filter-wrapper #filters #filter-wrapper-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
+      margin-bottom: 12px;
+      margin-top: -12px; }
+      body .main #filter-wrapper #filters #filter-wrapper-header h2 {
+        flex-basis: 40%; }
+      body .main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn, body .main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn {
+        cursor: pointer;
+        background-color: #073861;
+        text-transform: uppercase;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-weight: bold;
+        padding: 6px 16px; }
+        body .main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn .fa, body .main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn .fa {
+          margin-right: 8px; }
+    body .main #filter-wrapper #filters .step-separation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 -24px;
+      padding: 8px 24px;
+      border-top: 1px solid rgba(7, 56, 97, 0.4);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+      body .main #filter-wrapper #filters .step-separation h3 {
+        flex-basis: 80%;
+        text-transform: capitalize; }
+      body .main #filter-wrapper #filters .step-separation .fa {
+        cursor: pointer;
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.4); }
+    body .main #filter-wrapper #filters .select-wrapper {
+      display: flex;
       flex-wrap: wrap;
-      overflow-y: auto; }
-      body main #filter-wrapper #filters {
-        flex-basis: 100%;
-        align-self: flex-start; }
-        body main #filter-wrapper #filters #filter-wrapper-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 12px;
-          margin-top: -12px; }
-          body main #filter-wrapper #filters #filter-wrapper-header h2 {
-            flex-basis: 40%; }
-          body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn, body main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn {
-            cursor: pointer;
-            background-color: #073861;
-            text-transform: uppercase;
-            border: none;
-            outline: none;
-            color: #fff;
-            font-weight: bold;
-            padding: 6px 16px; }
-            body main #filter-wrapper #filters #filter-wrapper-header #clear-filter-btn .fa, body main #filter-wrapper #filters #filter-wrapper-header #apply-filter-btn .fa {
-              margin-right: 8px; }
-        body main #filter-wrapper #filters .step-separation {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin: 0 -24px;
-          padding: 8px 24px;
-          border-top: 1px solid rgba(7, 56, 97, 0.4);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-          body main #filter-wrapper #filters .step-separation h3 {
-            flex-basis: 80%;
-            text-transform: capitalize; }
-          body main #filter-wrapper #filters .step-separation .fa {
-            cursor: pointer;
-            font-size: 16px;
-            color: rgba(0, 0, 0, 0.4); }
-        body main #filter-wrapper #filters .select-wrapper {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          margin: 4px 0;
-          z-index: 2; }
-          body main #filter-wrapper #filters .select-wrapper label {
-            flex-basis: 108px;
-            font-size: 0.8em;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: rgba(0, 0, 0, 0.5);
-            margin-bottom: 6px;
-            flex-grow: 0;
-            flex-shrink: 0; }
-          body main #filter-wrapper #filters .select-wrapper > div {
-            flex-basis: calc(100% - 144px); }
-          body main #filter-wrapper #filters .select-wrapper img {
-            box-sizing: border-box;
-            object-fit: contain;
-            height: 20px;
-            flex-basis: 20px;
-            padding-left: 10px;
-            cursor: pointer; }
-            body main #filter-wrapper #filters .select-wrapper img.remove {
-              height: 16px;
-              flex-basis: 16px; }
-        body main #filter-wrapper #filters .data-category {
-          border-top: 1px solid rgba(0, 0, 0, 0.1);
-          padding: 10px 24px;
-          margin-left: -24px;
-          margin-right: -24px; }
-          body main #filter-wrapper #filters .data-category > label {
-            display: flex;
-            cursor: pointer;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            text-transform: uppercase;
-            font-weight: 600;
-            color: rgba(0, 0, 0, 0.8); }
-          body main #filter-wrapper #filters .data-category .material-toggle {
-            min-height: 16px;
-            min-width: 32px; }
-          body main #filter-wrapper #filters .data-category .material-toggle input[type="checkbox"] {
-            display: none; }
-          body main #filter-wrapper #filters .data-category .material-toggle label {
-            cursor: pointer;
-            background-color: #18bc9c;
-            height: 0px;
-            position: relative;
-            width: 32px; }
-          body main #filter-wrapper #filters .data-category .material-toggle > label::before {
-            background: black;
-            box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            content: '';
-            height: 10px;
-            width: 30px;
-            position: absolute;
-            opacity: 0.2;
-            transition: all 0.2s ease-in-out; }
-          body main #filter-wrapper #filters .data-category .material-toggle > label::after {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
-            content: '';
-            width: 16px;
-            height: 16px;
-            left: 0;
-            position: absolute;
-            transform: translateY(-3px);
-            transition: all 0.1s ease-in-out; }
-          body main #filter-wrapper #filters .data-category .material-toggle > input[type="checkbox"]:checked + label::before {
-            background: inherit;
-            opacity: 0.5; }
-          body main #filter-wrapper #filters .data-category .material-toggle > input[type="checkbox"]:checked + label::after {
-            background: inherit;
-            left: 14px; }
-          body main #filter-wrapper #filters .data-category#prospective-data-type {
-            border-top: none; }
-          body main #filter-wrapper #filters .data-category#hybrid-data-category {
-            margin-bottom: 12px; }
-            body main #filter-wrapper #filters .data-category#hybrid-data-category label {
-              margin-bottom: 0; }
-        body main #filter-wrapper #filters #region-selections {
-          text-transform: uppercase;
-          font-weight: 600;
-          display: block;
-          color: rgba(0, 0, 0, 0.8);
-          margin: 8px -24px;
-          padding: 0 24px; }
-      body main #filter-wrapper #the-map {
-        align-self: flex-end;
-        flex-basis: 100%;
-        height: calc(36% - 12px);
-        z-index: 1;
-        background-color: #fff;
-        border: 1px solid rgba(0, 0, 0, 0.1); }
-        body main #filter-wrapper #the-map .legend {
-          background-color: rgba(255, 255, 255, 0.9);
-          margin: 0;
-          padding: 8px;
-          border-radius: 3px; }
-          body main #filter-wrapper #the-map .legend > div span {
-            width: 16px;
-            height: 12px;
-            display: inline-block;
-            margin-right: 4px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            background-color: #d7dbdd;
-            vertical-align: baseline; }
-          body main #filter-wrapper #the-map .legend #selected-label span {
-            background-color: #70b6e5; }
-          body main #filter-wrapper #the-map .legend #not-selectable-label span {
-            background-color: #fff; }
-    body main #viewports-wrapper {
-      height: calc(100% - 12px);
-      flex-basis: calc(64% - 12px); }
-      body main #viewports-wrapper .wait-text {
-        color: #f0f0f0;
-        text-align: center;
-        flex-basis: 100%; }
-      body main #viewports-wrapper #viewport-graph {
-        height: calc(60% - 12px);
-        width: 98%;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; }
-        body main #viewports-wrapper #viewport-graph img {
-          height: 100%;
-          width: 100%;
-          object-fit: contain; }
-      body main #viewports-wrapper #viewport-chart {
-        height: 40%;
-        width: 98%;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start; }
-        body main #viewports-wrapper #viewport-chart img {
-          height: 100%;
-          width: 100%;
-          object-fit: contain; }
-  @media screen and (max-width: 1366px) {
-    body header {
-      height: 64px; }
-    body main {
-      flex-basis: 92%;
-      height: calc(100vh - 64px); } }
-  @media screen and (max-width: 1080px) {
-    body header {
-      height: 56px; }
-      body header h1 {
-        font-size: 1.5em; }
-    body main {
-      flex-basis: 98%;
-      height: calc(100vh - 56px); } }
-  @media screen and (max-width: 720px) {
-    body header {
-      padding: 4px 0 12px 0; }
-    body main {
-      flex-basis: 100%;
-      height: auto; }
-      body main #filter-wrapper {
-        flex-basis: 100%; }
-        body main #filter-wrapper #the-map {
-          height: 300px;
-          flex-basis: 100%; }
-      body main #viewports-wrapper {
-        flex-basis: 98%;
-        margin-top: 12px; }
-        body main #viewports-wrapper #viewport-graph, body main #viewports-wrapper #viewport-chart {
-          height: 60vh; } }
-  @media screen and (max-width: 540px) {
-    body header {
-      padding: 4px 0 12px 0; }
-      body header h1 {
-        font-size: 1.2em; }
-    body main {
-      flex-basis: 100%;
-      height: auto;
-      justify-content: flex-start;
-      align-items: flex-start;
-      margin: auto;
-      overflow: scroll; }
-      body main .card {
-        margin: 6px 0; }
-      body main #filter-wrapper {
-        flex-basis: 100vw;
-        height: auto; }
-        body main #filter-wrapper #the-map {
-          flex-basis: 100%;
-          height: 300px; }
-      body main #viewports-wrapper {
-        flex-basis: 720px;
-        flex-shrink: 0;
+      align-items: center;
+      justify-content: space-between;
+      margin: 4px 0;
+      z-index: 2; }
+      body .main #filter-wrapper #filters .select-wrapper label {
+        flex-basis: 108px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: rgba(0, 0, 0, 0.5);
+        margin-bottom: 6px;
         flex-grow: 0;
-        overflow-x: hidden; }
-        body main #viewports-wrapper #viewport-graph {
-          padding-bottom: 54px;
-          height: 60vh; }
-        body main #viewports-wrapper #viewport-chart {
-          padding-bottom: 54px;
-          height: 100vh; }
-        body main #viewports-wrapper .button-wrapper {
-          top: 32px; }
-        body main #viewports-wrapper svg {
-          margin-top: 54px; } }
+        flex-shrink: 0; }
+      body .main #filter-wrapper #filters .select-wrapper > div {
+        flex-basis: calc(100% - 144px); }
+      body .main #filter-wrapper #filters .select-wrapper img {
+        box-sizing: border-box;
+        object-fit: contain;
+        height: 20px;
+        flex-basis: 20px;
+        padding-left: 10px;
+        cursor: pointer; }
+        body .main #filter-wrapper #filters .select-wrapper img.remove {
+          height: 16px;
+          flex-basis: 16px; }
+    body .main #filter-wrapper #filters .data-category {
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 10px 24px;
+      margin-left: -24px;
+      margin-right: -24px; }
+      body .main #filter-wrapper #filters .data-category > label {
+        display: flex;
+        cursor: pointer;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.8); }
+      body .main #filter-wrapper #filters .data-category .material-toggle {
+        min-height: 16px;
+        min-width: 32px; }
+      body .main #filter-wrapper #filters .data-category .material-toggle input[type="checkbox"] {
+        display: none; }
+      body .main #filter-wrapper #filters .data-category .material-toggle label {
+        cursor: pointer;
+        background-color: #18bc9c;
+        height: 0px;
+        position: relative;
+        width: 32px; }
+      body .main #filter-wrapper #filters .data-category .material-toggle > label::before {
+        background: black;
+        box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        content: '';
+        height: 10px;
+        width: 30px;
+        position: absolute;
+        opacity: 0.2;
+        transition: all 0.2s ease-in-out; }
+      body .main #filter-wrapper #filters .data-category .material-toggle > label::after {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+        content: '';
+        width: 16px;
+        height: 16px;
+        left: 0;
+        position: absolute;
+        transform: translateY(-3px);
+        transition: all 0.1s ease-in-out; }
+      body .main #filter-wrapper #filters .data-category .material-toggle > input[type="checkbox"]:checked + label::before {
+        background: inherit;
+        opacity: 0.5; }
+      body .main #filter-wrapper #filters .data-category .material-toggle > input[type="checkbox"]:checked + label::after {
+        background: inherit;
+        left: 14px; }
+      body .main #filter-wrapper #filters .data-category#prospective-data-type {
+        border-top: none; }
+      body .main #filter-wrapper #filters .data-category#hybrid-data-category {
+        margin-bottom: 12px; }
+        body .main #filter-wrapper #filters .data-category#hybrid-data-category label {
+          margin-bottom: 0; }
+    body .main #filter-wrapper #filters #region-selections {
+      text-transform: uppercase;
+      font-weight: 600;
+      display: block;
+      color: rgba(0, 0, 0, 0.8);
+      margin: 8px -24px;
+      padding: 0 24px; }
+  body .main #filter-wrapper #the-map {
+    align-self: flex-end;
+    flex-basis: 100%;
+    height: calc(36% - 12px);
+    z-index: 1;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1); }
+    body .main #filter-wrapper #the-map .legend {
+      background-color: rgba(255, 255, 255, 0.9);
+      margin: 0;
+      padding: 8px;
+      border-radius: 3px; }
+      body .main #filter-wrapper #the-map .legend > div span {
+        width: 16px;
+        height: 12px;
+        display: inline-block;
+        margin-right: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        background-color: #d7dbdd;
+        vertical-align: baseline; }
+      body .main #filter-wrapper #the-map .legend #selected-label span {
+        background-color: #70b6e5; }
+      body .main #filter-wrapper #the-map .legend #not-selectable-label span {
+        background-color: #fff; }
+body .main #viewports-wrapper {
+  height: calc(90vh - 12px); }
+  body .main #viewports-wrapper .wait-text {
+    color: #f0f0f0;
+    text-align: center;
+    flex-basis: 100%; }
+  body .main #viewports-wrapper #viewport-graph {
+    height: calc(60% - 12px);
+    width: 98%;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; }
+    body .main #viewports-wrapper #viewport-graph img {
+      height: 100%;
+      width: 100%;
+      object-fit: contain; }
+  body .main #viewports-wrapper #viewport-chart {
+    height: 40%;
+    width: 98%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; }
+    body .main #viewports-wrapper #viewport-chart img {
+      height: 100%;
+      width: 100%;
+      object-fit: contain; }
+@media screen and (max-width: 1366px) {
+  body header {
+    height: 64px; }
+  body main {
+    flex-basis: 92%;
+    height: calc(100vh - 64px); } }
+@media screen and (max-width: 1080px) {
+  body header {
+    height: 56px; }
+    body header h1 {
+      font-size: 1.5em; }
+  body main {
+    flex-basis: 98%;
+    height: calc(100vh - 56px); } }
+@media screen and (max-width: 720px) {
+  body header {
+    padding: 4px 0 12px 0; }
+  body main {
+    flex-basis: 100%;
+    height: auto; }
+    body main #filter-wrapper {
+      flex-basis: 100%; }
+      body main #filter-wrapper #the-map {
+        height: 300px;
+        flex-basis: 100%; }
+    body main #viewports-wrapper {
+      flex-basis: 98%;
+      margin-top: 12px; }
+      body main #viewports-wrapper #viewport-graph, body main #viewports-wrapper #viewport-chart {
+        height: 60vh; } }
+@media screen and (max-width: 540px) {
+  body header {
+    padding: 4px 0 12px 0; }
+    body header h1 {
+      font-size: 1.2em; }
+  body main {
+    flex-basis: 100%;
+    height: auto;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin: auto;
+    overflow: scroll; }
+    body main .card {
+      margin: 6px 0; }
+    body main #filter-wrapper {
+      flex-basis: 100vw;
+      height: auto; }
+      body main #filter-wrapper #the-map {
+        flex-basis: 100%;
+        height: 300px; }
+    body main #viewports-wrapper {
+      flex-basis: 720px;
+      flex-shrink: 0;
+      flex-grow: 0;
+      overflow-x: hidden; }
+      body main #viewports-wrapper #viewport-graph {
+        padding-bottom: 54px;
+        height: 60vh; }
+      body main #viewports-wrapper #viewport-chart {
+        padding-bottom: 54px;
+        height: 100vh; }
+      body main #viewports-wrapper .button-wrapper {
+        top: 32px; }
+      body main #viewports-wrapper svg {
+        margin-top: 54px; } }
 
 .tooltip {
   z-index: 10;

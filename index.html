@@ -10,6 +10,7 @@
     <title>Disaster Related Displacement Risk Model</title>
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="static/css/main.css" rel='stylesheet' type='text/css'>
     <link href="static/css/selectize.css" rel='stylesheet' type='text/css'>
@@ -26,102 +27,98 @@
     <script src="static/js/drawChart.js"></script>
 </head>
 <body>
-    <header>
-        <a href="http://www.internal-displacement.org" target="_blank">
-            <img src="static/imgs/logo.png">
-        </a>
-        <h1>Disaster Related Displacement Risk Model</h1>
-    </header>
-    <main>
-        <div id="filter-wrapper" class="card">
-            <div id="filters">
-                <div id="filter-wrapper-header">
-                    <h2>Filters</h2>
-                    <div>
-                        <button id='clear-filter-btn'><i class="fa fa-filter"></i>Clear</button>
-                        <!-- <button id='apply-filter-btn'><i class="fa fa-check"></i>Apply</button> -->
-                    </div>
-                </div>
-                <div class="step-separation">
-                    <h3>Step 1 - analysis and hazard type</h3>
-                    <i class="fa fa-info-circle" title="Select the analysis and the hazard type"></i>
-                </div>
-                <div id="prospective-data-type" class="data-category">
-                    <label>
-                        <span>Prospective</span>
-                        <div class="material-toggle" title="Toggle prospective analysis selection">
-                    		<input class="filter" id="prospective-check" type="checkbox"/>
-                    		<label for="prospective-check"></label>
+    <div class="container-fluid main">
+        <div class="row">
+            <div class="col-md-4">
+                <div id="filter-wrapper" class="card">
+                    <div id="filters">
+                        <div id="filter-wrapper-header">
+                            <h2>Filters</h2>
+                            <div>
+                                <button id='clear-filter-btn'><i class="fa fa-filter"></i>Clear</button>
+                                <!-- <button id='apply-filter-btn'><i class="fa fa-check"></i>Apply</button> -->
+                            </div>
                         </div>
-                    </label>
-                    <div class="select-wrapper">
-                        <label>Hazard Type</label>
-                        <select class="filter hazard-type" placeholder="Hazard types" multiple>
-                        </select>
-                        <img class="select-all-hazard double-check" title="Select all hazards" src="static/imgs/double_check.png">
-                    </div>
+                        <div class="step-separation">
+                            <h3>Step 1 - analysis and hazard type</h3>
+                            <i class="fa fa-info-circle" title="Select the analysis and the hazard type"></i>
+                        </div>
+                        <div id="prospective-data-type" class="data-category">
+                            <label>
+                                <span>Prospective</span>
+                                <div class="material-toggle" title="Toggle prospective analysis selection">
+                                    <input class="filter" id="prospective-check" type="checkbox"/>
+                                    <label for="prospective-check"></label>
+                                </div>
+                            </label>
+                            <div class="select-wrapper">
+                                <label>Hazard Type</label>
+                                <select class="filter hazard-type" placeholder="Hazard types" multiple>
+                                </select>
+                                <img class="select-all-hazard double-check" title="Select all hazards" src="static/imgs/double_check.png">
+                            </div>
 
-                </div>
-                <div id="retrospective-data-type" class="data-category">
-                    <label>
-                        <span>Retrospective</span>
-                        <div class="material-toggle" title="Toggle retorspective analysis selection">
-                    		<input class="filter" id="retrospective-check" type="checkbox"/>
-                    		<label for="retrospective-check"></label>
                         </div>
-                    </label>
-                    <div class="select-wrapper">
-                        <label>Hazard Type</label>
-                        <select class="filter hazard-type" placeholder="Hazard types" multiple>
-                        </select>
-                        <img class="select-all-hazard double-check" title="Select all hazards" src="static/imgs/double_check.png">
+                        <div id="retrospective-data-type" class="data-category">
+                            <label>
+                                <span>Retrospective</span>
+                                <div class="material-toggle" title="Toggle retorspective analysis selection">
+                                    <input class="filter" id="retrospective-check" type="checkbox"/>
+                                    <label for="retrospective-check"></label>
+                                </div>
+                            </label>
+                            <div class="select-wrapper">
+                                <label>Hazard Type</label>
+                                <select class="filter hazard-type" placeholder="Hazard types" multiple>
+                                </select>
+                                <img class="select-all-hazard double-check" title="Select all hazards" src="static/imgs/double_check.png">
+                            </div>
+                        </div>
+                        <div id="hybrid-data-category" class="data-category">
+                            <label>
+                                <span>Hybrid</span>
+                                <div class="material-toggle" title="Toggle hybrid analysis selection">
+                                    <input class="filter" id="hybrid-check" type="checkbox"/>
+                                    <label for="hybrid-check"></label>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="step-separation">
+                            <h3>Step 2 - region and country</h3>
+                            <i class="fa fa-info-circle" title="Select the country or regions. For income groups and geographical regions only the Average Annual Displacement is available"></i>
+                        </div>
+                        <span id="region-selections">Region Selections</span>
+                        <div class="select-wrapper" id="geo-region-select-wrapper">
+                            <label>Geo regions</label>
+                            <select class="geo-region-select" placeholder="Select Geo Regions" multiple>
+                            </select>
+                        </div>
+                        <div class="select-wrapper" id="income-group-select-wrapper">
+                            <label>Income group</label>
+                            <select class="income-group-select" placeholder="Select Income Groups" multiple>
+                            </select>
+                        </div>
+                        <div class="select-wrapper" id="country-select-wrapper">
+                            <label>Countries</label>
+                            <select class="countries-select" placeholder="Select Countries" multiple>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="the-map">
                     </div>
                 </div>
-                <div id="hybrid-data-category" class="data-category">
-                    <label>
-                        <span>Hybrid</span>
-                        <div class="material-toggle" title="Toggle hybrid analysis selection">
-                    		<input class="filter" id="hybrid-check" type="checkbox"/>
-                    		<label for="hybrid-check"></label>
-                        </div>
-                    </label>
-                </div>
-                <div class="step-separation">
-                    <h3>Step 2 - region and country</h3>
-                    <i class="fa fa-info-circle" title="Select the country or regions. For income groups and geographical regions only the Average Annual Displacement is available"></i>
-                </div>
-                <span id="region-selections">Region Selections</span>
-                <div class="select-wrapper" id="geo-region-select-wrapper">
-                    <label>Geo regions</label>
-                    <select class="geo-region-select" placeholder="Select Geo Regions" multiple>
-                    </select>
-                </div>
-                <div class="select-wrapper" id="income-group-select-wrapper">
-                    <label>Income group</label>
-                    <select class="income-group-select" placeholder="Select Income Groups" multiple>
-                    </select>
-                </div>
-                <div class="select-wrapper" id="country-select-wrapper">
-                    <label>Countries</label>
-                    <select class="countries-select" placeholder="Select Countries" multiple>
-                    </select>
-                </div>
             </div>
-            <div id="the-map">
+            <div class="col-md-8">
+                <div id="viewports-wrapper">
+                    <div id="viewport-graph" class="card">
+                        <h2 class="wait-text">DISPLACEMENT EXCEEDANCE CURVE will appear here</h2>
+                    </div>
+                    <div id="viewport-chart" class="card">
+                        <h2 class="wait-text">AVERAGE ANNUAL DISPLACEMENT will appear here</h2>
+                    </div>
+                </div>
             </div>
         </div>
-        <div id="viewports-wrapper">
-            <div id="viewport-graph" class="card">
-                <h2 class="wait-text">DISPLACEMENT EXCEEDANCE CURVE will appear here</h2>
-            </div>
-            <div id="viewport-chart" class="card">
-                <h2 class="wait-text">AVERAGE ANNUAL DISPLACEMENT will appear here</h2>
-            </div>
-        </div>
-    </main>
-    <!-- <footer hidden>
-        <div id="expanded-viewport">
-        </div>
-    </footer> -->
+    </div>
 </body>
 </html>
